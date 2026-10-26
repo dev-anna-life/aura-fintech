@@ -1,0 +1,9 @@
+{
+  "appId": "com.aurafintech.app",
+  "appName": "Aura Smart Wealth",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}
