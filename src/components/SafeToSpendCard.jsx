@@ -34,6 +34,20 @@ export default function SafeToSpendCard({
   const daysRemaining = Math.max(1, daysInMonth - today.getDate())
   const dailyPace = displaySafe / daysRemaining
 
+  const startingSafeNgn = rawSafeNgn + totalSpentNgn
+  const baselinePaceNgn = daysInMonth > 0 ? startingSafeNgn / daysInMonth : rawSafeNgn
+  const displayBaselinePace = isUSD ? baselinePaceNgn / exchangeRate : baselinePaceNgn
+  const paceDifference = dailyPace - displayBaselinePace
+  const isPaceAdjusted = Math.abs(paceDifference) >= 1
+
+  const todaySpentNgn = transactions
+    .filter(t => (t.date === 'Today' || t.date === 'Just now') && Number(t.amount) < 0)
+    .reduce((sum, t) => {
+      const amt = Math.abs(Number(t.amount))
+      return sum + (t.currency === 'USD' ? amt * exchangeRate : amt)
+    }, 0)
+  const displayTodaySpent = isUSD ? todaySpentNgn / exchangeRate : todaySpentNgn
+
   const safePercent = totalBalanceNgn > 0
     ? Math.min(100, Math.round((rawSafeNgn / totalBalanceNgn) * 100))
     : 0
@@ -129,6 +143,54 @@ export default function SafeToSpendCard({
             ({daysRemaining} days left)
           </div>
         </div>
+
+        <div
+          style={{
+            marginTop: '10px',
+            padding: '8px 12px',
+            background: 'rgba(0, 168, 132, 0.08)',
+            border: '1px solid rgba(0, 168, 132, 0.2)',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+        >
+          <div
+            style={{
+              width: '22px',
+              height: '22px',
+              borderRadius: '7px',
+              background: 'linear-gradient(135deg, #0B3D2E, #00A884)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="23 4 23 10 17 10" />
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+            </svg>
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '10px', fontWeight: '800', color: '#0B3D2E', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                Dynamic GPS Recalibration
+              </span>
+              <span style={{ fontSize: '10px', fontWeight: '800', color: paceDifference < 0 ? '#0B3D2E' : '#00A884' }}>
+                {paceDifference < 0
+                  ? `-${currencySymbol}${Math.abs(Math.round(paceDifference)).toLocaleString()}/day`
+                  : `+${currencySymbol}${Math.abs(Math.round(paceDifference)).toLocaleString()}/day`}
+              </span>
+            </div>
+            <div style={{ fontSize: '10px', color: '#64748B', fontWeight: '500', marginTop: '1px' }}>
+              {paceDifference < -5
+                ? `Allowance dynamically shifted across ${daysRemaining} days to protect rent and savings.`
+                : 'Daily pace on track. Bills and goal savings targets 100% protected.'}
+            </div>
+          </div>
+        </div>
       </div>
 
       <div style={{ marginBottom: '14px' }}>
@@ -184,9 +246,28 @@ export default function SafeToSpendCard({
 
           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#F8FAF7', borderRadius: '12px', border: '1px solid rgba(0, 168, 132, 0.1)' }}>
             <span style={{ fontSize: '11px', color: '#64748B', fontWeight: '600' }}>Active Savings Commitments</span>
-            <span style={{ fontSize: '12px', color: '#D4AF37', fontWeight: '800' }}>
+            <span style={{ fontSize: '12px', color: '#00A884', fontWeight: '800' }}>
               -{currencySymbol}{(isUSD ? savingsNgn / exchangeRate : savingsNgn).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'rgba(0, 168, 132, 0.05)', borderRadius: '12px', border: '1px solid rgba(0, 168, 132, 0.18)' }}>
+            <div>
+              <div style={{ fontSize: '11px', color: '#0B3D2E', fontWeight: '700' }}>Daily Pace Calibration</div>
+              <div style={{ fontSize: '10px', color: '#64748B', fontWeight: '500' }}>
+                Baseline: {currencySymbol}{Math.round(displayBaselinePace).toLocaleString()}/day
+              </div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '12px', color: '#0B3D2E', fontWeight: '800' }}>
+                {currencySymbol}{Math.round(dailyPace).toLocaleString()} / day
+              </div>
+              <div style={{ fontSize: '9px', fontWeight: '700', color: paceDifference < 0 ? '#0B3D2E' : '#00A884' }}>
+                {paceDifference < 0
+                  ? `Recalibrated by -${currencySymbol}${Math.abs(Math.round(paceDifference)).toLocaleString()}/day`
+                  : 'Pace on healthy track'}
+              </div>
+            </div>
           </div>
 
           <div style={{
