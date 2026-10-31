@@ -20,6 +20,7 @@ import CategoryBreakdown from './components/CategoryBreakdown'
 import SafeToSpendCard from './components/SafeToSpendCard'
 import BudgetsScreen from './components/BudgetsScreen'
 import GoalsScreen from './components/GoalsScreen'
+import HealthScoreScreen from './components/HealthScoreScreen'
 import { api, getToken } from './services/api'
 import { USER, TRANSACTIONS, formatTransactionDate } from './data/fintechData'
 
@@ -34,6 +35,7 @@ function HomeScreen({
   onRecord,
   onOpenGoals,
   onOpenBudgets,
+  onOpenHealthScore,
   onSelectTx,
   onViewAll,
   transactions,
@@ -51,6 +53,27 @@ function HomeScreen({
         <AuraLogo size={28} showWordmark={true} light={true} />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button
+            onClick={onOpenHealthScore}
+            className="tap-spring"
+            style={{
+              background: '#FFFFFF',
+              border: '1px solid rgba(0, 168, 132, 0.22)',
+              borderRadius: '20px',
+              padding: '6px 12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
+            }}
+          >
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00A884', boxShadow: '0 0 6px rgba(0, 168, 132, 0.6)' }} />
+            <span style={{ fontSize: '11px', fontWeight: '800', color: '#0B3D2E' }}>
+              Health: 88/100
+            </span>
+          </button>
+
           <button
             style={{
               position: 'relative',
@@ -656,6 +679,7 @@ export default function App() {
   const [selectedTx, setSelectedTx] = useState(null)
   const [islandAlert, setIslandAlert] = useState(null)
   const [showBudgets, setShowBudgets] = useState(false)
+  const [showHealthScore, setShowHealthScore] = useState(false)
   const [budgets, setBudgets] = useState(() => {
     try {
       const saved = localStorage.getItem('aura_budgets')
@@ -1012,6 +1036,7 @@ export default function App() {
                   onRecord={() => setShowAddTransactionModal(true)}
                   onOpenGoals={() => setActiveNav('wallet')}
                   onOpenBudgets={() => setShowBudgets(true)}
+                  onOpenHealthScore={() => setShowHealthScore(true)}
                   onSelectTx={tx => setSelectedTx(tx)}
                   onViewAll={() => setActiveNav('activity')}
                   transactions={transactions}
@@ -1159,6 +1184,19 @@ export default function App() {
                   onClose={() => setShowBudgets(false)}
                 />
               </div>
+            )}
+
+            {showHealthScore && (
+              <HealthScoreScreen
+                transactions={transactions}
+                budgets={budgets}
+                goals={goals}
+                balance={balance}
+                committedBills={45000}
+                committedSavings={activeMonthlyGoalsCommitment}
+                currency={currency}
+                onClose={() => setShowHealthScore(false)}
+              />
             )}
           </>
         )}
