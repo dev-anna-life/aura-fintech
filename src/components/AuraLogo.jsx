@@ -14,44 +14,45 @@ export default function AuraLogo({ size = 32, showWordmark = false, light = fals
         style={{ flexShrink: 0 }}
       >
         <defs>
-          <linearGradient id="auraArchGrad" x1="0" y1="100" x2="80" y2="10" gradientUnits="userSpaceOnUse">
+          <linearGradient id="sovraGradPrimary" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
             <stop offset="0%" stopColor="#00A884" />
-            <stop offset="50%" stopColor="#10B981" />
-            <stop offset="100%" stopColor="#0B3D2E" />
+            <stop offset="70%" stopColor="#0B3D2E" />
+            <stop offset="100%" stopColor="#041712" />
           </linearGradient>
-          <linearGradient id="auraGoldWave" x1="15" y1="75" x2="85" y2="45" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#C89B2B" />
-            <stop offset="45%" stopColor="#F6D365" />
-            <stop offset="75%" stopColor="#D4AF37" />
-            <stop offset="100%" stopColor="#A87C1C" />
+          <linearGradient id="sovraGradAccent" x1="30" y1="10" x2="70" y2="90" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#10B981" />
+            <stop offset="100%" stopColor="#00A884" />
           </linearGradient>
         </defs>
 
-        <path
-          d="M 22 76 C 22 76 34 38 47 20 C 49 17 53 17 55 20 C 68 38 80 76 80 76 C 73 78 63 76 63 76 C 58 60 55 45 53 40 C 52 37 49 37 48 40 C 46 45 43 60 38 76 Z"
-          fill="url(#auraArchGrad)"
-        />
+        <rect width="100" height="100" rx="26" fill="#0B3D2E" />
 
         <path
-          d="M 24 70 C 33 66 44 52 52 46 C 62 39 74 46 80 50 C 76 56 68 59 61 55 C 51 49 41 60 31 73 Z"
-          fill="url(#auraGoldWave)"
+          d="M 68 28 C 60 18 46 18 36 24 C 25 31 25 45 35 51 C 45 57 66 59 71 68 C 76 77 71 90 56 92 C 41 94 29 86 26 76"
+          stroke="url(#sovraGradAccent)"
+          strokeWidth="11"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
+
+        <circle cx="68" cy="28" r="4.5" fill="#10B981" />
+        <circle cx="26" cy="76" r="4.5" fill="#00A884" />
       </svg>
 
       {showWordmark && (
         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
           <span style={{
             fontSize: iconSize * 0.58 + 'px',
-            fontWeight: '800',
+            fontWeight: '900',
             letterSpacing: '-0.03em',
             color: light ? '#0F1F1B' : '#FFFFFF'
           }}>
             Sovra
           </span>
           <span style={{
-            fontSize: iconSize * 0.26 + 'px',
-            fontWeight: '700',
-            letterSpacing: '0.04em',
+            fontSize: iconSize * 0.24 + 'px',
+            fontWeight: '800',
+            letterSpacing: '0.08em',
             color: '#00A884',
             textTransform: 'uppercase'
           }}>

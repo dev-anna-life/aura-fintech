@@ -7,7 +7,7 @@ import AuraLogo from './AuraLogo'
 export default function AuthScreen({ onLoginSuccess }) {
   const [mode, setMode] = useState('login')
   const [step, setStep] = useState('form')
-  const [email, setEmail] = useState('alex.morgan@aura.io')
+  const [email, setEmail] = useState('alex.morgan@sovra.io')
   const [password, setPassword] = useState('password123')
   const [fullName, setFullName] = useState('')
   const [phone, setPhone] = useState('')
@@ -162,34 +162,17 @@ export default function AuthScreen({ onLoginSuccess }) {
         textAlign: 'center',
         flexShrink: 0
       }}>
-        <div style={{ marginBottom: '8px' }}>
+        <div style={{ marginBottom: '4px' }}>
           <AuraLogo size={42} showWordmark={true} light={true} />
         </div>
 
         <div style={{
-          fontSize: '11px',
+          fontSize: '12px',
           color: '#64748B',
-          fontWeight: '600',
-          marginBottom: '12px',
-          letterSpacing: '0.02em'
+          fontWeight: '500',
+          marginTop: '4px'
         }}>
-          Institutional Wealth & Regulated Custody
-        </div>
-
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '6px',
-          background: 'rgba(0, 168, 132, 0.1)',
-          border: '1px solid rgba(0, 168, 132, 0.25)',
-          borderRadius: '16px',
-          padding: '4px 12px',
-          fontSize: '10px',
-          fontWeight: '700',
-          color: '#00A884'
-        }}>
-          <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00A884' }} />
-          CBN Regulated : NDIC Insured Partner
+          Sovereign wealth and financial clarity
         </div>
       </div>
 
@@ -438,7 +421,7 @@ export default function AuthScreen({ onLoginSuccess }) {
             </label>
             <input
               type="email"
-              placeholder="alex.morgan@aura.io"
+              placeholder="alex.morgan@sovra.io"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
@@ -605,11 +588,19 @@ export default function AuthScreen({ onLoginSuccess }) {
           marginTop: 'auto',
           paddingTop: '20px',
           textAlign: 'center',
-          fontSize: '10px',
-          color: '#64748B',
-          fontWeight: '500'
+          fontSize: '11px',
+          color: '#94A3B8',
+          fontWeight: '500',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '6px'
         }}>
-          Bank-grade 256-bit AES Encryption : Tier 2 Regulated
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+          <span>End-to-end encrypted financial security</span>
         </div>
       </div>
 
