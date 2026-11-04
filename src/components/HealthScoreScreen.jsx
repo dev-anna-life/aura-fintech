@@ -419,7 +419,7 @@ export default function HealthScoreScreen({
               </svg>
             </div>
             <span style={{ fontSize: '11px', fontWeight: '800', color: '#0B3D2E', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-              Aura Weekly Prescriptive Action
+              Sovra Weekly Prescriptive Action
             </span>
           </div>
 

@@ -1,8 +1,8 @@
-# Aura: Smart Wealth & Discipline Engine
+# Sovra: Sovereign Wealth & Financial Discipline Engine
 
 A modern, institutional-grade personal finance application designed to eliminate false spending confidence. Built with **React**, **Node.js/Express**, and packaged for mobile via **Capacitor Android**.
 
-![Aura Architecture](https://img.shields.io/badge/Architecture-React%20%7C%20Node.js%20%7C%20Capacitor-0B3D2E?style=for-the-badge)
+![Sovra Architecture](https://img.shields.io/badge/Architecture-React%20%7C%20Node.js%20%7C%20Capacitor-0B3D2E?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active%20MVP-00A884?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-0F1F1B?style=for-the-badge)
 
@@ -12,7 +12,7 @@ A modern, institutional-grade personal finance application designed to eliminate
 
 Most conventional banking applications show account holders their gross liquid balance. Seeing a large number creates false confidence, leading users into the classic "wealthy on the 1st, broke by the 15th" cycle.
 
-**Aura solves this by separating gross balance from uncommitted liquidity:**
+**Sovra solves this by separating gross balance from uncommitted liquidity:**
 
 $$\text{Safe-to-Spend} = \text{Liquid Balance} - \text{Committed Bills} - \text{Active Savings Targets}$$
 
@@ -20,7 +20,7 @@ $$\text{Safe-to-Spend} = \text{Liquid Balance} - \text{Committed Bills} - \text{
 
 ## Key Features
 
-### 1. Aura Safe-to-Spend Engine
+### 1. Sovra Safe-to-Spend Engine
 - Computes uncommitted daily spending allowances in real time.
 - Dynamic daily pace: spreads remaining safe liquidity across the remaining days of the month.
 - Automatic recalibration: overspending on one day smoothly recalculates the remaining daily allowance without rigid lockouts or punitive UX.
@@ -34,7 +34,11 @@ $$\text{Safe-to-Spend} = \text{Liquid Balance} - \text{Committed Bills} - \text{
 - Customizable spending limits across Food & Dining, Transport, Bills, Shopping, Subscriptions, and Health.
 - Visual consumption bars with proactive warnings at the 80% mark and over-budget triggers at 100%.
 
-### 4. Spending Ledger & Financial Activity
+### 4. Financial Health Score & Weekly Reality Check
+- Mathematical composite 0 to 100 scoring based on Budget Discipline (40%), Goal Velocity (35%), and Liquidity Cushion (25%).
+- Weekly diagnostic with prescriptive rules to keep long-term wealth protected.
+
+### 5. Spending Ledger & Financial Activity
 - Categorized income and expense logging.
 - Automatic transaction synchronization with Safe-to-Spend allowances.
 - Instant currency toggle between Nigerian Naira (NGN) and US Dollars (USD).

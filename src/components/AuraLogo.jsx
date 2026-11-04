@@ -46,16 +46,16 @@ export default function AuraLogo({ size = 32, showWordmark = false, light = fals
             letterSpacing: '-0.03em',
             color: light ? '#0F1F1B' : '#FFFFFF'
           }}>
-            Aura
+            Sovra
           </span>
           <span style={{
-            fontSize: iconSize * 0.28 + 'px',
-            fontWeight: '600',
-            letterSpacing: '0.02em',
-            color: '#D4AF37',
-            textTransform: 'lowercase'
+            fontSize: iconSize * 0.26 + 'px',
+            fontWeight: '700',
+            letterSpacing: '0.04em',
+            color: '#00A884',
+            textTransform: 'uppercase'
           }}>
-            smart wealth
+            sovereign wealth
           </span>
         </div>
       )}

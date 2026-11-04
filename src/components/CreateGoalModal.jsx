@@ -290,7 +290,7 @@ export default function CreateGoalModal({ currency = 'NGN', onCreateGoal, onClos
             }}
           >
             <div style={{ fontSize: '10px', fontWeight: '800', color: '#0B3D2E', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
-              Aura Smart Savings Plan
+              Sovra Sovereign Savings Plan
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
               <span style={{ fontSize: '11px', color: '#64748B', fontWeight: '600' }}>Suggested Weekly Pace</span>

@@ -89,7 +89,7 @@ export default function SafeToSpendCard({
             }}
           />
           <span style={{ fontSize: '11px', fontWeight: '800', color: '#0B3D2E', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-            Aura Safe-To-Spend
+            Sovra Safe-To-Spend
           </span>
         </div>
 
@@ -286,7 +286,7 @@ export default function SafeToSpendCard({
           </div>
 
           <div style={{ fontSize: '10px', color: '#64748B', lineHeight: '1.45', marginTop: '4px' }}>
-            Aura reserves money for your rent, utilities, and savings before you spend it, so you never get stranded before payday.
+            Sovra reserves money for your rent, utilities, and savings before you spend it, so you never get stranded before payday.
           </div>
         </div>
       )}
