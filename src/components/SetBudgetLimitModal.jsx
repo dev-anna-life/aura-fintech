@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 
 const THRESHOLD_PRESETS = [
-  { value: 50, label: '50% Early Warning', desc: 'Alerts at half spent' },
-  { value: 65, label: '65% Cautious', desc: 'Moderate buffer' },
-  { value: 75, label: '75% Standard', desc: 'Balanced guardrail' },
-  { value: 85, label: '85% Strict', desc: 'Close to ceiling' },
-  { value: 90, label: '90% Last Call', desc: 'Final warning' }
+  { value: 50, label: '50% Early' },
+  { value: 65, label: '65% Cautious' },
+  { value: 75, label: '75% Normal' },
+  { value: 85, label: '85% Late' },
+  { value: 90, label: '90% Final' }
 ]
 
 export default function SetBudgetLimitModal({
@@ -253,10 +253,10 @@ export default function SetBudgetLimitModal({
                 </div>
                 <div>
                   <div style={{ fontSize: '11px', fontWeight: '800', color: '#0B3D2E', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    Alert Sensitivity Threshold
+                    Budget Alert Trigger
                   </div>
                   <div style={{ fontSize: '10px', color: '#64748B', fontWeight: '500' }}>
-                    Custom early warning trigger
+                    Choose when Sovra sends you an alert
                   </div>
                 </div>
               </div>
@@ -318,9 +318,9 @@ export default function SetBudgetLimitModal({
                 }}
               />
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', color: '#94A3B8', fontWeight: '700', marginTop: '2px' }}>
-                <span>40% (Aggressive)</span>
-                <span>75% (Standard)</span>
-                <span>95% (Ceiling)</span>
+                <span>40% (Early warning)</span>
+                <span>75% (Normal)</span>
+                <span>95% (Late)</span>
               </div>
             </div>
 
@@ -344,7 +344,7 @@ export default function SetBudgetLimitModal({
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '10px', color: '#64748B', fontWeight: '500' }}>
-                  Safety cushion before limit breach:
+                  Money left before budget runs out:
                 </span>
                 <span style={{ fontSize: '11px', color: '#00A884', fontWeight: '800', fontVariantNumeric: 'tabular-nums' }}>
                   {currencySymbol}{bufferAmount.toLocaleString()}
@@ -379,9 +379,9 @@ export default function SetBudgetLimitModal({
             }}
           >
             {savedSuccess ? (
-              <span>Guardrail & Alert Configured ✓</span>
+              <span>Saved Successfully ✓</span>
             ) : (
-              <span>Save Guardrail & Alert Rule</span>
+              <span>Save Budget & Alert</span>
             )}
           </button>
         </form>

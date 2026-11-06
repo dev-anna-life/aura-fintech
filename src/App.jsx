@@ -716,8 +716,8 @@ export default function App() {
       })
     }
     triggerIsland({
-      title: 'Guardrail Configured',
-      subtitle: `${catId} cap & ${newThreshold || 75}% alert active`,
+      title: 'Budget Updated',
+      subtitle: `${catId} limit and ${newThreshold || 75}% alert saved`,
       icon: 'card',
       color: '#00A884'
     })
@@ -1026,15 +1026,15 @@ export default function App() {
 
       if (currentPct >= 100) {
         triggerIsland({
-          title: `🚨 ${normCat} Cap Exceeded!`,
-          subtitle: `Spent 100%+ of monthly limit`,
+          title: `${normCat} Budget Exceeded`,
+          subtitle: `You spent over 100% of your limit`,
           icon: 'card',
           color: '#EF4444'
         })
       } else if (currentPct >= thresholdPct) {
         triggerIsland({
-          title: `⚠️ ${normCat} Guardrail Triggered`,
-          subtitle: `Passed custom ${thresholdPct}% threshold (${currentPct}%)`,
+          title: `${normCat} Budget Alert`,
+          subtitle: `You reached your ${thresholdPct}% warning`,
           icon: 'card',
           color: '#F59E0B'
         })

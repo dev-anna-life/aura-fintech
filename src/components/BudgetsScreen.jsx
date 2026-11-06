@@ -202,11 +202,11 @@ export default function BudgetsScreen({
           </div>
         </div>
 
-        {/* Active Guardrail Alerts Banner */}
+        {/* Spending Alerts Banner */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ fontSize: '11px', fontWeight: '800', color: '#0F1F1B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Active Guardrail Radar
+              Spending Alerts
             </div>
             <span style={{ fontSize: '10px', color: '#64748B', fontWeight: '600' }}>
               Custom Thresholds
@@ -266,7 +266,7 @@ export default function BudgetsScreen({
             >
               <div style={{ fontSize: '14px' }}>🛡️</div>
               <div style={{ fontSize: '11px', color: '#0B3D2E', fontWeight: '600' }}>
-                All category spending is well within your custom alert thresholds. Safe-to-Spend remains fully guarded.
+                All category spending is within your budget limits. You have good control of your expenses.
               </div>
             </div>
           )}
