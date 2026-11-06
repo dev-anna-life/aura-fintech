@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 export default function HealthScoreScreen({
   transactions = [],
   budgets = {},
+  thresholds = {},
   goals = [],
   balance = 0,
   committedBills = 45000,
@@ -59,10 +60,11 @@ export default function HealthScoreScreen({
 
   defaultCategories.forEach(c => {
     const limit = budgets[c] || 45000
+    const thresholdPct = (thresholds && thresholds[c]) !== undefined ? thresholds[c] : 80
     const spent = spendingByCategory[c] || 0
     if (spent >= limit) {
       overBudgetCount += 1
-    } else if (spent >= limit * 0.8) {
+    } else if (spent >= limit * (thresholdPct / 100)) {
       nearBudgetCount += 1
     }
   })

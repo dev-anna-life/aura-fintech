@@ -689,13 +689,37 @@ export default function App() {
     }
   })
 
-  function handleUpdateBudget(catId, newLimit) {
+  const [budgetThresholds, setBudgetThresholds] = useState(() => {
+    try {
+      const saved = localStorage.getItem('aura_budget_thresholds')
+      return saved ? JSON.parse(saved) : { Food: 75, Transport: 80, Bills: 85, Shopping: 65, Subscription: 80, Health: 80, Other: 75 }
+    } catch {
+      return { Food: 75, Transport: 80, Bills: 85, Shopping: 65, Subscription: 80, Health: 80, Other: 75 }
+    }
+  })
+
+  function handleUpdateBudget(catId, newLimit, newThreshold) {
     setBudgets(prev => {
       const updated = { ...prev, [catId]: newLimit }
       try {
         localStorage.setItem('aura_budgets', JSON.stringify(updated))
       } catch {}
       return updated
+    })
+    if (newThreshold !== undefined) {
+      setBudgetThresholds(prev => {
+        const updated = { ...prev, [catId]: newThreshold }
+        try {
+          localStorage.setItem('aura_budget_thresholds', JSON.stringify(updated))
+        } catch {}
+        return updated
+      })
+    }
+    triggerIsland({
+      title: 'Guardrail Configured',
+      subtitle: `${catId} cap & ${newThreshold || 75}% alert active`,
+      icon: 'card',
+      color: '#00A884'
     })
   }
 
@@ -985,12 +1009,51 @@ export default function App() {
     setTransactions(prev => [newTx, ...prev])
     const deltaAmount = newTx.amount / (currency === 'NGN' ? 160 : 1)
     setBalance(prev => Math.max(0, prev + deltaAmount))
-    triggerIsland({
-      title: newTx.type === 'expense' ? 'Expense Recorded' : 'Income Added',
-      subtitle: `${newTx.merchant} (${newTx.category})`,
-      icon: 'send',
-      color: newTx.color || '#00A884'
-    })
+
+    if (newTx.type === 'expense') {
+      const cat = newTx.category || 'Other'
+      const normCat = ['Food', 'Transport', 'Bills', 'Shopping', 'Subscription', 'Health'].find(
+        c => c.toLowerCase() === cat.toLowerCase() || cat.toLowerCase().includes(c.toLowerCase())
+      ) || 'Other'
+
+      const limit = budgets[normCat] || 60000
+      const thresholdPct = budgetThresholds[normCat] || 75
+      const currentSpent = transactions
+        .filter(t => Number(t.amount) < 0 && (t.category === cat || t.category === normCat))
+        .reduce((sum, t) => sum + Math.abs(Number(t.amount)), 0) + Math.abs(Number(newTx.amount))
+
+      const currentPct = limit > 0 ? Math.round((currentSpent / limit) * 100) : 0
+
+      if (currentPct >= 100) {
+        triggerIsland({
+          title: `🚨 ${normCat} Cap Exceeded!`,
+          subtitle: `Spent 100%+ of monthly limit`,
+          icon: 'card',
+          color: '#EF4444'
+        })
+      } else if (currentPct >= thresholdPct) {
+        triggerIsland({
+          title: `⚠️ ${normCat} Guardrail Triggered`,
+          subtitle: `Passed custom ${thresholdPct}% threshold (${currentPct}%)`,
+          icon: 'card',
+          color: '#F59E0B'
+        })
+      } else {
+        triggerIsland({
+          title: 'Expense Recorded',
+          subtitle: `${newTx.merchant} (${newTx.category})`,
+          icon: 'send',
+          color: newTx.color || '#00A884'
+        })
+      }
+    } else {
+      triggerIsland({
+        title: 'Income Added',
+        subtitle: `${newTx.merchant} (${newTx.category})`,
+        icon: 'topup',
+        color: '#00A884'
+      })
+    }
   }
 
   async function handleToggleFreeze() {
@@ -1179,6 +1242,7 @@ export default function App() {
                 <BudgetsScreen
                   transactions={transactions}
                   budgets={budgets}
+                  thresholds={budgetThresholds}
                   currency={currency}
                   onUpdateBudget={handleUpdateBudget}
                   onClose={() => setShowBudgets(false)}
@@ -1190,6 +1254,7 @@ export default function App() {
               <HealthScoreScreen
                 transactions={transactions}
                 budgets={budgets}
+                thresholds={budgetThresholds}
                 goals={goals}
                 balance={balance}
                 committedBills={45000}

@@ -14,13 +14,14 @@ const DEFAULT_CATEGORIES = [
 export default function BudgetsScreen({
   transactions = [],
   budgets = {},
+  thresholds = {},
   currency = 'NGN',
   onUpdateBudget,
   onClose
 }) {
   const [editingCategory, setEditingCategory] = useState(null)
   const isUSD = currency === 'USD'
-  const exchangeRate = 1625
+  const exchangeRate = 160
   const currencySymbol = isUSD ? '$' : '₦'
 
   const spendingByCategory = {}
@@ -51,9 +52,22 @@ export default function BudgetsScreen({
   const alerts = DEFAULT_CATEGORIES.map(c => {
     const spent = spendingByCategory[c.id] || 0
     const limit = budgets[c.id] || (isUSD ? 40 : 60000)
+    const thresholdPct = (thresholds && thresholds[c.id]) !== undefined ? thresholds[c.id] : 75
     const pct = limit > 0 ? Math.round((spent / limit) * 100) : 0
-    return { ...c, spent, limit, pct }
-  }).filter(c => c.pct >= 75)
+    const triggerAmt = Math.round(limit * (thresholdPct / 100))
+    const isTriggered = pct >= thresholdPct
+    const isOver = spent > limit
+    return {
+      ...c,
+      spent,
+      limit,
+      thresholdPct,
+      pct,
+      triggerAmt,
+      isTriggered,
+      isOver
+    }
+  }).filter(c => c.isTriggered)
 
   return (
     <div
@@ -67,6 +81,7 @@ export default function BudgetsScreen({
         scrollbarWidth: 'none'
       }}
     >
+      {/* Header */}
       <div
         style={{
           position: 'sticky',
@@ -83,10 +98,10 @@ export default function BudgetsScreen({
       >
         <div>
           <div style={{ fontSize: '18px', fontWeight: '800', color: '#0F1F1B', letterSpacing: '-0.02em' }}>
-            Budgets & Spending Limits
+            Budgets & Guardrails
           </div>
           <div style={{ fontSize: '11px', color: '#64748B', fontWeight: '500' }}>
-            Category guardrails for smart wealth
+            Dynamic category caps & custom alert triggers
           </div>
         </div>
 
@@ -113,6 +128,7 @@ export default function BudgetsScreen({
       </div>
 
       <div style={{ padding: '16px 18px 90px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        {/* Monthly Budget Health Card */}
         <div
           style={{
             background: 'linear-gradient(135deg, #0B3D2E 0%, #0F2D24 100%)',
@@ -178,57 +194,92 @@ export default function BudgetsScreen({
               </div>
             </div>
             <div>
-              <div style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.5)', fontWeight: '600' }}>Spending Status</div>
-              <div style={{ fontSize: '14px', fontWeight: '800', color: overallPercent > 90 ? '#EF4444' : '#D4AF37', marginTop: '2px' }}>
-                {overallPercent > 90 ? 'Limit Exceeded' : 'Disciplined'}
+              <div style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.5)', fontWeight: '600' }}>Guardrail Status</div>
+              <div style={{ fontSize: '14px', fontWeight: '800', color: overallPercent > 90 ? '#EF4444' : alerts.length > 0 ? '#F59E0B' : '#00A884', marginTop: '2px' }}>
+                {overallPercent > 90 ? 'Limit Exceeded' : alerts.length > 0 ? `${alerts.length} Alert Active` : 'Disciplined'}
               </div>
             </div>
           </div>
         </div>
 
-        {alerts.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <div style={{ fontSize: '11px', fontWeight: '700', color: '#0F1F1B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Active Guardrail Alerts
+        {/* Active Guardrail Alerts Banner */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ fontSize: '11px', fontWeight: '800', color: '#0F1F1B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Active Guardrail Radar
             </div>
-            {alerts.map(a => (
+            <span style={{ fontSize: '10px', color: '#64748B', fontWeight: '600' }}>
+              Custom Thresholds
+            </span>
+          </div>
+
+          {alerts.length > 0 ? (
+            alerts.map(a => (
               <div
                 key={a.id}
                 style={{
-                  background: a.pct >= 100 ? 'rgba(239, 68, 68, 0.08)' : 'rgba(245, 158, 11, 0.08)',
-                  border: a.pct >= 100 ? '1px solid rgba(239, 68, 68, 0.25)' : '1px solid rgba(245, 158, 11, 0.25)',
-                  borderRadius: '14px',
-                  padding: '10px 14px',
+                  background: a.isOver ? 'rgba(239, 68, 68, 0.08)' : 'rgba(245, 158, 11, 0.08)',
+                  border: a.isOver ? '1px solid rgba(239, 68, 68, 0.25)' : '1px solid rgba(245, 158, 11, 0.25)',
+                  borderRadius: '16px',
+                  padding: '12px 14px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '10px'
+                  gap: '12px'
                 }}
               >
                 <div
                   style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    background: a.pct >= 100 ? '#EF4444' : '#F59E0B',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '10px',
+                    background: a.isOver ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '14px',
                     flexShrink: 0
                   }}
-                />
-                <div style={{ flex: 1, fontSize: '11px', color: '#0F1F1B' }}>
-                  <span style={{ fontWeight: '800' }}>{a.label}</span> is at{' '}
-                  <span style={{ fontWeight: '800', color: a.pct >= 100 ? '#DC2626' : '#B45309' }}>{a.pct}%</span> of monthly limit.
+                >
+                  {a.isOver ? '🚨' : '⚠️'}
+                </div>
+                <div style={{ flex: 1, fontSize: '11px', color: '#0F1F1B', lineHeight: '1.4' }}>
+                  <div style={{ fontWeight: '800', fontSize: '12px', color: a.isOver ? '#DC2626' : '#B45309' }}>
+                    {a.label} {a.isOver ? 'Exceeded Budget Limit' : `Crossed Custom ${a.thresholdPct}% Threshold`}
+                  </div>
+                  <div style={{ color: '#64748B', marginTop: '2px', fontSize: '10px' }}>
+                    Spent <span style={{ fontWeight: '700', color: '#0F1F1B' }}>{currencySymbol}{a.spent.toLocaleString()}</span> of {currencySymbol}{a.limit.toLocaleString()} ({a.pct}%)
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          ) : (
+            <div
+              style={{
+                background: 'rgba(0, 168, 132, 0.06)',
+                border: '1px solid rgba(0, 168, 132, 0.2)',
+                borderRadius: '16px',
+                padding: '12px 14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}
+            >
+              <div style={{ fontSize: '14px' }}>🛡️</div>
+              <div style={{ fontSize: '11px', color: '#0B3D2E', fontWeight: '600' }}>
+                All category spending is well within your custom alert thresholds. Safe-to-Spend remains fully guarded.
+              </div>
+            </div>
+          )}
+        </div>
 
+        {/* Category List */}
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
             <div style={{ fontSize: '12px', fontWeight: '800', color: '#0F1F1B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Category Spending Limits
+              Category Guardrails
             </div>
-            <span style={{ fontSize: '11px', color: '#64748B', fontWeight: '600' }}>
-              Tap any category to adjust
+            <span style={{ fontSize: '10px', color: '#00A884', fontWeight: '700' }}>
+              Tap category to configure
             </span>
           </div>
 
@@ -236,9 +287,12 @@ export default function BudgetsScreen({
             {DEFAULT_CATEGORIES.map(cat => {
               const spent = spendingByCategory[cat.id] || 0
               const limit = budgets[cat.id] || (isUSD ? 40 : 60000)
+              const thresholdPct = (thresholds && thresholds[cat.id]) !== undefined ? thresholds[cat.id] : 75
               const pct = limit > 0 ? Math.min(100, Math.round((spent / limit) * 100)) : 0
               const remaining = Math.max(0, limit - spent)
               const isOver = spent > limit
+              const isThresholdCrossed = pct >= thresholdPct
+              const triggerAmt = Math.round(limit * (thresholdPct / 100))
 
               return (
                 <div
@@ -247,7 +301,11 @@ export default function BudgetsScreen({
                   className="tap-spring"
                   style={{
                     background: '#FFFFFF',
-                    border: '1px solid rgba(0, 168, 132, 0.14)',
+                    border: isOver
+                      ? '1px solid rgba(239, 68, 68, 0.35)'
+                      : isThresholdCrossed
+                      ? '1px solid rgba(245, 158, 11, 0.35)'
+                      : '1px solid rgba(0, 168, 132, 0.14)',
                     borderRadius: '18px',
                     padding: '14px 16px',
                     cursor: 'pointer',
@@ -261,8 +319,8 @@ export default function BudgetsScreen({
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <div
                         style={{
-                          width: '34px',
-                          height: '34px',
+                          width: '36px',
+                          height: '36px',
                           borderRadius: '10px',
                           background: `${cat.color}15`,
                           border: `1px solid ${cat.color}35`,
@@ -277,11 +335,33 @@ export default function BudgetsScreen({
                         {cat.icon}
                       </div>
                       <div>
-                        <div style={{ fontSize: '13px', fontWeight: '800', color: '#0F1F1B' }}>
-                          {cat.label}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontSize: '13px', fontWeight: '800', color: '#0F1F1B' }}>
+                            {cat.label}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: '9px',
+                              fontWeight: '700',
+                              padding: '2px 6px',
+                              borderRadius: '6px',
+                              background: isOver
+                                ? 'rgba(239, 68, 68, 0.12)'
+                                : isThresholdCrossed
+                                ? 'rgba(245, 158, 11, 0.12)'
+                                : 'rgba(0, 168, 132, 0.1)',
+                              color: isOver
+                                ? '#DC2626'
+                                : isThresholdCrossed
+                                ? '#D97706'
+                                : '#00A884'
+                            }}
+                          >
+                            🔔 {thresholdPct}% alert
+                          </span>
                         </div>
                         <div style={{ fontSize: '10px', color: '#64748B', marginTop: '1px' }}>
-                          Limit: {currencySymbol}{limit.toLocaleString()}
+                          Cap: {currencySymbol}{limit.toLocaleString()} · Alert at {currencySymbol}{triggerAmt.toLocaleString()}
                         </div>
                       </div>
                     </div>
@@ -296,22 +376,39 @@ export default function BudgetsScreen({
                     </div>
                   </div>
 
-                  <div>
-                    <div style={{ height: '6px', background: '#F1F5F2', borderRadius: '3px', overflow: 'hidden' }}>
+                  {/* Visual Tripwire Progress Track */}
+                  <div style={{ position: 'relative', marginTop: '2px' }}>
+                    <div style={{ height: '7px', background: '#F1F5F2', borderRadius: '4px', overflow: 'hidden', position: 'relative' }}>
                       <div
                         style={{
                           height: '100%',
                           width: `${pct}%`,
                           background: isOver
                             ? '#EF4444'
-                            : pct > 80
+                            : isThresholdCrossed
                             ? '#F59E0B'
                             : cat.color || '#00A884',
-                          borderRadius: '3px',
+                          borderRadius: '4px',
                           transition: 'width 0.3s ease'
                         }}
                       />
                     </div>
+                    {/* Tripwire Notch Marker */}
+                    <div
+                      title={`Alert trigger: ${thresholdPct}%`}
+                      style={{
+                        position: 'absolute',
+                        top: '-2px',
+                        left: `${thresholdPct}%`,
+                        width: '2px',
+                        height: '11px',
+                        background: '#0F1F1B',
+                        borderRadius: '1px',
+                        opacity: 0.45,
+                        transform: 'translateX(-50%)',
+                        pointerEvents: 'none'
+                      }}
+                    />
                   </div>
                 </div>
               )
@@ -325,9 +422,10 @@ export default function BudgetsScreen({
           categories={DEFAULT_CATEGORIES}
           initialCategory={editingCategory}
           currentBudgets={budgets}
+          currentThresholds={thresholds}
           currency={currency}
-          onSaveLimit={(catId, newLimit) => {
-            onUpdateBudget(catId, newLimit)
+          onSaveLimit={(catId, newLimit, newThreshold) => {
+            onUpdateBudget(catId, newLimit, newThreshold)
           }}
           onClose={() => setEditingCategory(null)}
         />
