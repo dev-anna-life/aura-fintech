@@ -7,7 +7,7 @@ export default function LiveFaceScanner({ onVerified, onClose, enrolledFace }) {
   const [scanStatus, setScanStatus] = useState('Initializing Biometric Sensor...')
   const [verified, setVerified] = useState(false)
 
-  const activeFace = enrolledFace || localStorage.getItem('aura_registered_face') || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'
+  const activeFace = enrolledFace || localStorage.getItem('aura_registered_face') || null
 
   useEffect(() => {
     let mounted = true
@@ -61,6 +61,10 @@ export default function LiveFaceScanner({ onVerified, onClose, enrolledFace }) {
       } catch (err) {
         if (!mounted) return
         setCameraActive(false)
+        if (!activeFace) {
+          setScanStatus('No enrolled Face ID found. Please enroll or use passcode.')
+          return
+        }
         setScanStatus('Matching enrolled biometric profile...')
 
         setTimeout(() => {
@@ -207,6 +211,25 @@ export default function LiveFaceScanner({ onVerified, onClose, enrolledFace }) {
               objectFit: 'cover'
             }}
           />
+        )}
+
+        {!cameraActive && !activeFace && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#64748B',
+            textAlign: 'center',
+            padding: '20px'
+          }}>
+            <svg width="60" height="60" fill="none" viewBox="0 0 24 24" stroke="#00A884" strokeWidth="1.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+            <div style={{ fontSize: '11px', color: '#94A3B8', marginTop: '8px' }}>
+              No Enrolled Face Found
+            </div>
+          </div>
         )}
 
         {!verified && (

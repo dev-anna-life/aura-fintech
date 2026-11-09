@@ -68,7 +68,10 @@ export default function PhoneFrame({ children, islandAlert }) {
 
   useEffect(() => {
     function checkMobile() {
-      const isMobile = window.innerWidth <= 520 || window.matchMedia('(display-mode: standalone)').matches
+      const isMobile = window.innerWidth <= 600 ||
+        window.matchMedia('(display-mode: standalone)').matches ||
+        Boolean(window.Capacitor) ||
+        /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
       setIsMobileScreen(isMobile)
     }
     checkMobile()
@@ -90,7 +93,7 @@ export default function PhoneFrame({ children, islandAlert }) {
       }}>
         {/* Top Status Bar Safe Area Spacer for Real Phones */}
         <div style={{
-          height: 'max(42px, env(safe-area-inset-top, 42px))',
+          height: 'max(46px, env(safe-area-inset-top, 46px))',
           width: '100%',
           flexShrink: 0,
           background: '#F8FAF7',
@@ -101,7 +104,7 @@ export default function PhoneFrame({ children, islandAlert }) {
           <div
             style={{
               position: 'fixed',
-              top: 'max(48px, calc(env(safe-area-inset-top, 42px) + 6px))',
+              top: 'max(52px, calc(env(safe-area-inset-top, 46px) + 6px))',
               left: '50%',
               transform: 'translateX(-50%)',
               width: '90%',

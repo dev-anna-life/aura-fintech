@@ -118,14 +118,17 @@ export const api = {
     return { token, user, wallet: DEFAULT_WALLET }
   },
 
-  async login({ email, password, isDemo }) {
+  async login({ email, password, isDemo, isBiometric }) {
     try {
       const data = await request('/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password, isDemo })
+        body: JSON.stringify({ email, password, isDemo, isBiometric })
       })
       if (data && data.token) {
         setToken(data.token)
+        if (data.user) {
+          localStorage.setItem('aura_cached_user', JSON.stringify(data.user))
+        }
         return data
       }
     } catch (err) {
@@ -141,7 +144,13 @@ export const api = {
     const cleanEmail = email ? email.toLowerCase().trim() : ''
     const isAnnastesia = cleanEmail.includes('amarachi') || cleanEmail.includes('ugwuanyi')
 
-    const user = {
+    const cachedUserStr = localStorage.getItem('aura_cached_user')
+    let cachedUser = null
+    try {
+      cachedUser = cachedUserStr ? JSON.parse(cachedUserStr) : null
+    } catch (e) {}
+
+    const user = cachedUser || {
       ...DEFAULT_USER,
       name: isAnnastesia ? 'Annastesia Amarachi Ugwuanyi' : 'Alex Morgan',
       firstName: isAnnastesia ? 'Annastesia' : 'Alex',

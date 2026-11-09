@@ -99,13 +99,26 @@ export default function AuthScreen({ onLoginSuccess }) {
     }
   }
 
+  function handleStartFaceAuth() {
+    setErrorMessage('')
+    const enrolledFace = localStorage.getItem('aura_registered_face')
+    if (!enrolledFace) {
+      setErrorMessage('No Face ID enrolled on this device. Please create an account or sign in with email/passcode to register your Face ID.')
+      return
+    }
+    setShowFaceScanner(true)
+  }
+
   async function handleFaceScannerSuccess() {
     setShowFaceScanner(false)
     setIsAuthenticating(true)
     setAuthStage('Biometric Face ID Confirmed')
 
     try {
-      const result = await api.login({ isDemo: true })
+      const cached = localStorage.getItem('aura_cached_user')
+      const cachedUser = cached ? JSON.parse(cached) : null
+      const emailToUse = cachedUser?.email || email || 'alex.morgan@sovra.io'
+      const result = await api.login({ email: emailToUse, isBiometric: true })
       setTimeout(() => {
         setIsAuthenticating(false)
         onLoginSuccess(result)
@@ -553,7 +566,7 @@ export default function AuthScreen({ onLoginSuccess }) {
 
             <button
               type="button"
-              onClick={() => setShowFaceScanner(true)}
+              onClick={handleStartFaceAuth}
               disabled={isAuthenticating}
               className="tap-spring"
               style={{
