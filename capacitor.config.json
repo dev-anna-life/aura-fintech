@@ -1,6 +1,6 @@
 {
   "appId": "com.aurafintech.app",
-  "appName": "Aura Smart Wealth",
+  "appName": "Sovra",
   "webDir": "dist",
   "bundledWebRuntime": false,
   "server": {
