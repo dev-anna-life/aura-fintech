@@ -78,12 +78,30 @@ export default function PhoneFrame({ children, islandAlert }) {
 
   if (isMobileScreen) {
     return (
-      <div style={{ width: '100%', height: '100vh', background: '#F8FAF7', overflow: 'hidden', position: 'relative' }}>
+      <div style={{
+        width: '100%',
+        height: '100vh',
+        background: '#F8FAF7',
+        overflow: 'hidden',
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        boxSizing: 'border-box'
+      }}>
+        {/* Top Status Bar Safe Area Spacer for Real Phones */}
+        <div style={{
+          height: 'max(42px, env(safe-area-inset-top, 42px))',
+          width: '100%',
+          flexShrink: 0,
+          background: '#F8FAF7',
+          zIndex: 90
+        }} />
+
         {activeAlert && (
           <div
             style={{
               position: 'fixed',
-              top: '12px',
+              top: 'max(48px, calc(env(safe-area-inset-top, 42px) + 6px))',
               left: '50%',
               transform: 'translateX(-50%)',
               width: '90%',
@@ -111,7 +129,27 @@ export default function PhoneFrame({ children, islandAlert }) {
             </div>
           </div>
         )}
-        {children}
+
+        <div style={{
+          flex: 1,
+          width: '100%',
+          height: '100%',
+          overflow: 'hidden',
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          boxSizing: 'border-box'
+        }}>
+          {children}
+        </div>
+
+        {/* Bottom Gesture Bar Safe Area Spacer */}
+        <div style={{
+          height: 'max(8px, env(safe-area-inset-bottom, 8px))',
+          width: '100%',
+          flexShrink: 0,
+          background: '#F8FAF7'
+        }} />
       </div>
     )
   }
