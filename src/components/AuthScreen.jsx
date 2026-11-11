@@ -293,7 +293,7 @@ export default function AuthScreen({ onLoginSuccess }) {
             textAlign: 'center'
           }}>
             <div>{errorMessage}</div>
-            {mode === 'login' && (
+            {mode === 'login' && !errorMessage.includes('Face ID') && (
               <button
                 type="button"
                 onClick={() => { setMode('reset'); setErrorMessage('') }}

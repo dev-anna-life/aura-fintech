@@ -100,20 +100,9 @@ function HomeScreen({
                 return 'Good evening,'
               })()}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '1px' }}>
-              <span style={{ fontSize: '17px', fontWeight: '900', color: '#0F1F1B', letterSpacing: '-0.02em' }}>
+            <div style={{ marginTop: '1px' }}>
+              <span style={{ fontSize: '18px', fontWeight: '900', color: '#0F1F1B', letterSpacing: '-0.02em' }}>
                 Hi, {user?.firstName || (user?.name ? user.name.trim().split(' ')[0] : 'Member')}
-              </span>
-              <span style={{
-                background: 'rgba(0, 168, 132, 0.1)',
-                color: '#0B3D2E',
-                fontSize: '10px',
-                fontWeight: '700',
-                padding: '1px 6px',
-                borderRadius: '6px',
-                letterSpacing: '0.02em'
-              }}>
-                Tier 1
               </span>
             </div>
           </div>
