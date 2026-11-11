@@ -32,15 +32,15 @@ const DEFAULT_WALLET = {
 
 const DEFAULT_USER = {
   id: 'usr_default_01',
-  name: 'Alex Morgan',
-  firstName: 'Alex',
-  email: 'alex.morgan@sovra.io',
-  phone: '+234 815 678 9060',
-  avatar: 'AM',
+  name: 'Ugwuanyi Annastesia Amarachi',
+  firstName: 'Ugwuanyi',
+  email: 'annastesia@sovra.io',
+  phone: '+234 904 809 5365',
+  avatar: 'UA',
   accountType: 'Sovereign Wealth Tier',
   accountNumber: '8029148201',
   tier: 'Verified Sovereign',
-  memberSince: 'Oct 2026'
+  memberSince: 'Nov 2026'
 }
 
 const DEFAULT_BENEFICIARIES = [
@@ -67,6 +67,41 @@ function saveStoredAccount(email, accountData) {
     accounts[email.toLowerCase().trim()] = accountData
     localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts))
   } catch (e) {}
+}
+
+function getActivePhoto(userPhoto) {
+  if (userPhoto) return userPhoto
+  try {
+    return localStorage.getItem('aura_registered_face') || null
+  } catch (e) {
+    return null
+  }
+}
+
+function getPrimaryStoredUser() {
+  // Check if any account in the vault has a user with a registered name
+  try {
+    const accounts = getStoredAccounts()
+    for (const key of Object.keys(accounts)) {
+      const u = accounts[key]?.user
+      if (u && u.name && !u.name.toLowerCase().includes('default') && !u.name.toLowerCase().includes('alex')) {
+        return u
+      }
+    }
+  } catch (e) {}
+
+  // Check aura_cached_user
+  try {
+    const cached = localStorage.getItem('aura_cached_user')
+    if (cached) {
+      const u = JSON.parse(cached)
+      if (u && u.name && !u.name.toLowerCase().includes('default') && !u.name.toLowerCase().includes('alex')) {
+        return u
+      }
+    }
+  } catch (e) {}
+
+  return null
 }
 
 async function request(endpoint, options = {}) {
@@ -124,20 +159,25 @@ export const api = {
     // Standalone mobile & client vault registration
     const token = 'sovra_token_' + Date.now()
     setToken(token)
-    const cleanEmail = email ? email.toLowerCase().trim() : 'member@sovra.io'
-    const names = fullName ? fullName.trim().split(' ') : ['Member']
+    const cleanEmail = email ? email.toLowerCase().trim() : 'annastesia@sovra.io'
+    const names = fullName ? fullName.trim().split(' ') : ['Ugwuanyi']
+    const activePhoto = getActivePhoto(photoUrl)
     const user = {
       id: `usr_${Date.now()}`,
-      name: fullName || 'Sovra Member',
-      firstName: names[0] || 'Member',
+      name: fullName || 'Ugwuanyi Annastesia Amarachi',
+      firstName: names[0] || 'Ugwuanyi',
       email: cleanEmail,
       phone: phone || '+234 904 809 5365',
-      photoUrl: photoUrl || null,
-      avatar: names.map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'M',
+      photoUrl: activePhoto,
+      avatar: names.map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'UA',
       accountType: 'Sovereign Wealth Tier',
       accountNumber: '80' + Math.floor(10000000 + Math.random() * 90000000).toString(),
-      tier: 'Verified Sovereign',
+      tier: 'Standard Tier',
       memberSince: 'Nov 2026'
+    }
+
+    if (activePhoto) {
+      localStorage.setItem('aura_registered_face', activePhoto)
     }
 
     // Save account credentials to vault
@@ -160,6 +200,7 @@ export const api = {
       if (data && data.token) {
         setToken(data.token)
         if (data.user) {
+          data.user.photoUrl = getActivePhoto(data.user.photoUrl)
           localStorage.setItem('aura_cached_user', JSON.stringify(data.user))
         }
         return data
@@ -185,43 +226,51 @@ export const api = {
       }
     }
 
-    const isAnnastesia = cleanEmail.includes('amarachi') || cleanEmail.includes('ugwuanyi')
-    let fallbackFirstName = 'Member'
-    let fallbackFullName = 'Sovra Member'
-    if (isAnnastesia) {
-      fallbackFirstName = 'Annastesia'
-      fallbackFullName = 'Annastesia Amarachi Ugwuanyi'
-    } else if (cleanEmail) {
-      const handle = cleanEmail.split('@')[0]
-      const parts = handle.split(/[._-]/).filter(Boolean)
-      if (parts.length > 0) {
-        fallbackFirstName = parts[0].charAt(0).toUpperCase() + parts[0].slice(1)
-        fallbackFullName = parts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ')
+    const existingPrimary = getPrimaryStoredUser()
+    const activePhoto = getActivePhoto(storedAccount?.user?.photoUrl || existingPrimary?.photoUrl)
+
+    let user
+    if (storedAccount?.user) {
+      user = {
+        ...storedAccount.user,
+        photoUrl: activePhoto || storedAccount.user.photoUrl
+      }
+    } else if (existingPrimary) {
+      user = {
+        ...existingPrimary,
+        email: cleanEmail || existingPrimary.email,
+        photoUrl: activePhoto || existingPrimary.photoUrl
+      }
+    } else {
+      const isAnnastesia = cleanEmail.includes('amarachi') || cleanEmail.includes('ugwuanyi') || cleanEmail.includes('anna')
+      let firstName = 'Ugwuanyi'
+      let fullName = 'Ugwuanyi Annastesia Amarachi'
+
+      if (!isAnnastesia && cleanEmail) {
+        const handle = cleanEmail.split('@')[0]
+        const parts = handle.split(/[._-]/).filter(Boolean)
+        if (parts.length > 0) {
+          firstName = parts[0].charAt(0).toUpperCase() + parts[0].slice(1)
+          fullName = parts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ')
+        }
+      }
+
+      user = {
+        ...DEFAULT_USER,
+        name: fullName,
+        firstName: firstName,
+        email: cleanEmail || 'annastesia@sovra.io',
+        photoUrl: activePhoto,
+        avatar: (firstName[0] + (fullName.split(' ')[1]?.[0] || 'A')).toUpperCase()
       }
     }
 
-    const cachedUserStr = localStorage.getItem('aura_cached_user')
-    let cachedUser = null
-    try {
-      cachedUser = cachedUserStr ? JSON.parse(cachedUserStr) : null
-    } catch (e) {}
-
-    const user = storedAccount?.user || cachedUser || {
-      ...DEFAULT_USER,
-      name: fallbackFullName,
-      firstName: fallbackFirstName,
-      email: cleanEmail || 'member@sovra.io',
-      avatar: (fallbackFirstName[0] + (fallbackFullName.split(' ')[1]?.[0] || '')).toUpperCase()
-    }
-
-    // If first-time user with email and password, save credentials
-    if (!storedAccount && cleanEmail && password) {
-      saveStoredAccount(cleanEmail, {
-        user,
-        password,
-        wallet: DEFAULT_WALLET
-      })
-    }
+    // Save/update credentials
+    saveStoredAccount(cleanEmail, {
+      user,
+      password: password || storedAccount?.password || 'default',
+      wallet: storedAccount?.wallet || DEFAULT_WALLET
+    })
 
     localStorage.setItem('aura_cached_user', JSON.stringify(user))
     return { token, user, wallet: storedAccount?.wallet || DEFAULT_WALLET }
@@ -243,27 +292,40 @@ export const api = {
     const accounts = getStoredAccounts()
     let account = accounts[cleanEmail]
 
+    const existingPrimary = getPrimaryStoredUser()
+    const activePhoto = getActivePhoto(account?.user?.photoUrl || existingPrimary?.photoUrl)
+
     if (account) {
       account.password = newPassword
       account.updatedAt = Date.now()
-      saveStoredAccount(cleanEmail, account)
       if (account.user) {
+        account.user.photoUrl = activePhoto || account.user.photoUrl
         localStorage.setItem('aura_cached_user', JSON.stringify(account.user))
       }
+      saveStoredAccount(cleanEmail, account)
     } else {
-      const isAnnastesia = cleanEmail.includes('amarachi') || cleanEmail.includes('ugwuanyi')
-      const handle = cleanEmail.split('@')[0] || 'member'
-      const parts = handle.split(/[._-]/).filter(Boolean)
-      const firstName = isAnnastesia ? 'Annastesia' : (parts[0] ? parts[0].charAt(0).toUpperCase() + parts[0].slice(1) : 'Member')
-      const fullName = isAnnastesia ? 'Annastesia Amarachi Ugwuanyi' : parts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ') || 'Sovra Member'
+      const baseUser = existingPrimary || DEFAULT_USER
+      const isAnnastesia = cleanEmail.includes('amarachi') || cleanEmail.includes('ugwuanyi') || cleanEmail.includes('anna')
+
+      let firstName = baseUser.firstName || 'Ugwuanyi'
+      let fullName = baseUser.name || 'Ugwuanyi Annastesia Amarachi'
+
+      if (!isAnnastesia && !existingPrimary && cleanEmail) {
+        const handle = cleanEmail.split('@')[0]
+        const parts = handle.split(/[._-]/).filter(Boolean)
+        if (parts.length > 0) {
+          firstName = parts[0].charAt(0).toUpperCase() + parts[0].slice(1)
+          fullName = parts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ')
+        }
+      }
 
       const user = {
-        ...DEFAULT_USER,
-        id: `usr_${Date.now()}`,
+        ...baseUser,
         name: fullName,
-        firstName,
+        firstName: firstName,
         email: cleanEmail,
-        avatar: (firstName[0] + (fullName.split(' ')[1]?.[0] || '')).toUpperCase()
+        photoUrl: activePhoto || baseUser.photoUrl,
+        avatar: (firstName[0] + (fullName.split(' ')[1]?.[0] || 'A')).toUpperCase()
       }
 
       account = {
@@ -280,21 +342,64 @@ export const api = {
 
   async getCurrentUser() {
     const data = await request('/user/me')
-    if (data) return data
+    if (data && data.user) {
+      data.user.photoUrl = getActivePhoto(data.user.photoUrl)
+      return data
+    }
     const storedUser = localStorage.getItem('aura_cached_user')
     const storedWallet = localStorage.getItem('aura_cached_wallet')
+    let parsedUser = null
+    try {
+      parsedUser = storedUser ? JSON.parse(storedUser) : getPrimaryStoredUser() || DEFAULT_USER
+    } catch (e) {
+      parsedUser = getPrimaryStoredUser() || DEFAULT_USER
+    }
+    if (parsedUser) {
+      parsedUser.photoUrl = getActivePhoto(parsedUser.photoUrl)
+    }
     return {
-      user: storedUser ? JSON.parse(storedUser) : DEFAULT_USER,
+      user: parsedUser,
       wallet: storedWallet ? JSON.parse(storedWallet) : DEFAULT_WALLET
     }
   },
 
-  async updateProfile({ name, phone }) {
-    const data = await request('/user/profile', {
-      method: 'PUT',
-      body: JSON.stringify({ name, phone })
-    })
-    return data || { success: true }
+  async updateProfile({ name, firstName, phone, photoUrl }) {
+    try {
+      await request('/user/profile', {
+        method: 'PUT',
+        body: JSON.stringify({ name, phone })
+      })
+    } catch (e) {}
+
+    const existingStr = localStorage.getItem('aura_cached_user')
+    let existing = {}
+    try {
+      existing = existingStr ? JSON.parse(existingStr) : {}
+    } catch (e) {}
+
+    const updatedUser = {
+      ...DEFAULT_USER,
+      ...existing,
+      ...(name ? { name } : {}),
+      ...(firstName ? { firstName } : {}),
+      ...(phone ? { phone } : {}),
+      ...(photoUrl ? { photoUrl } : {})
+    }
+
+    if (photoUrl) {
+      localStorage.setItem('aura_registered_face', photoUrl)
+    }
+    localStorage.setItem('aura_cached_user', JSON.stringify(updatedUser))
+
+    if (updatedUser.email) {
+      const accounts = getStoredAccounts()
+      const cleanEmail = updatedUser.email.toLowerCase().trim()
+      if (accounts[cleanEmail]) {
+        accounts[cleanEmail].user = updatedUser
+        localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts))
+      }
+    }
+    return { success: true, user: updatedUser }
   },
 
   async getWallet() {

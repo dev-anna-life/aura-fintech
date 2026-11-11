@@ -70,15 +70,19 @@ function HomeScreen({
             position: 'relative',
             flexShrink: 0
           }}>
-            {user?.photoUrl ? (
-              <img
-                src={user.photoUrl}
-                alt={user.firstName || 'User'}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            ) : (
-              user?.avatar || (user?.firstName ? user.firstName[0].toUpperCase() : 'M')
-            )}
+            {(() => {
+              const displayPhoto = user?.photoUrl || (typeof localStorage !== 'undefined' ? localStorage.getItem('aura_registered_face') : null)
+              if (displayPhoto) {
+                return (
+                  <img
+                    src={displayPhoto}
+                    alt={user?.firstName || 'User'}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                )
+              }
+              return user?.avatar || (user?.firstName ? user.firstName[0].toUpperCase() : 'U')
+            })()}
             <div style={{
               position: 'absolute',
               bottom: '1px',
@@ -102,7 +106,7 @@ function HomeScreen({
             </div>
             <div style={{ marginTop: '1px' }}>
               <span style={{ fontSize: '18px', fontWeight: '900', color: '#0F1F1B', letterSpacing: '-0.02em' }}>
-                Hi, {user?.firstName || (user?.name ? user.name.trim().split(' ')[0] : 'Member')}
+                Hi, {user?.firstName || (user?.name ? user.name.trim().split(' ')[0] : 'Ugwuanyi')}
               </span>
             </div>
           </div>
@@ -473,14 +477,53 @@ function WalletScreen({ user, balance, wallet, hidden, isFrozen, onToggleFreeze,
   )
 }
 
-function MoreScreen({ user, wallet, onSignOut, onViewActivity }) {
+function MoreScreen({ user, wallet, onSignOut, onViewActivity, onUpdateUser }) {
+  const [isEditing, setIsEditing] = React.useState(false)
+  const [editFullName, setEditFullName] = React.useState(user?.name || 'Ugwuanyi Annastesia Amarachi')
+  const [editFirstName, setEditFirstName] = React.useState(user?.firstName || 'Ugwuanyi')
+  const [editPhoto, setEditPhoto] = React.useState(null)
+  const [isSaving, setIsSaving] = React.useState(false)
+
+  const displayPhoto = editPhoto || user?.photoUrl || (typeof localStorage !== 'undefined' ? localStorage.getItem('aura_registered_face') : null)
+
+  function handlePhotoUpload(e) {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        setEditPhoto(event.target.result)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  async function handleSaveProfile(e) {
+    if (e) e.preventDefault()
+    setIsSaving(true)
+    try {
+      const res = await api.updateProfile({
+        name: editFullName.trim(),
+        firstName: editFirstName.trim(),
+        photoUrl: displayPhoto
+      })
+      if (res?.user && onUpdateUser) {
+        onUpdateUser(res.user)
+      }
+      setIsEditing(false)
+    } catch (err) {
+      console.error('Failed to update profile', err)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
   const profileDetails = [
-    { icon: 'ID', label: 'NUBAN Custody Account', value: user.accountNumber || '8029148201' },
-    { icon: 'EM', label: 'Primary Email', value: user.email || 'alex.morgan@aura.io' },
-    { icon: 'PH', label: 'Verified Phone', value: user.phone || '+234 801 234 5678' },
-    { icon: 'TR', label: 'Compliance Level', value: 'Tier 2 : BVN & NIN Verified' },
-    { icon: 'CD', label: 'Cardholder Name', value: wallet?.cardHolder || user.name || 'ALEX MORGAN' },
-    { icon: 'DT', label: 'Member Since', value: user.memberSince || 'Sep 2026' }
+    { icon: 'ID', label: 'NUBAN Custody Account', value: user?.accountNumber || '8029148201' },
+    { icon: 'EM', label: 'Primary Email', value: user?.email || 'annastesia@sovra.io' },
+    { icon: 'PH', label: 'Verified Phone', value: user?.phone || '+234 904 809 5365' },
+    { icon: 'TR', label: 'Compliance Level', value: user?.bvn ? 'Tier 1 : BVN Verified' : 'Standard Tier : Submit BVN in Settings for Tier 1' },
+    { icon: 'CD', label: 'Cardholder Name', value: wallet?.cardHolder || user?.name || 'UGWUANYI A. AMARACHI' },
+    { icon: 'DT', label: 'Member Since', value: user?.memberSince || 'Nov 2026' }
   ]
 
   return (
@@ -492,8 +535,8 @@ function MoreScreen({ user, wallet, onSignOut, onViewActivity }) {
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '24px' }}>
         <div style={{
-          width: '74px',
-          height: '74px',
+          width: '76px',
+          height: '76px',
           borderRadius: '24px',
           background: 'linear-gradient(135deg, #0B3D2E, #00A884)',
           display: 'flex',
@@ -502,37 +545,160 @@ function MoreScreen({ user, wallet, onSignOut, onViewActivity }) {
           fontSize: '24px',
           fontWeight: '900',
           color: '#ffffff',
-          border: '1px solid rgba(0, 168, 132, 0.35)',
+          border: '2px solid rgba(0, 168, 132, 0.35)',
           boxShadow: '0 8px 24px rgba(0, 168, 132, 0.25)',
           marginBottom: '12px',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          position: 'relative'
         }}>
-          {user?.photoUrl ? (
+          {displayPhoto ? (
             <img
-              src={user.photoUrl}
-              alt={user.name || 'User'}
+              src={displayPhoto}
+              alt={user?.name || 'User'}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           ) : (
-            user.avatar || 'AM'
+            user?.avatar || (user?.firstName ? user.firstName[0].toUpperCase() : 'U')
           )}
         </div>
-        <div style={{ fontSize: '18px', fontWeight: '800', color: '#0F1F1B' }}>{user.name || 'Alex Morgan'}</div>
+        <div style={{ fontSize: '18px', fontWeight: '800', color: '#0F1F1B' }}>{user?.name || 'Ugwuanyi Annastesia Amarachi'}</div>
         <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px', fontWeight: '500' }}>
-          {user.accountType || 'Aura Institutional Vault'}
+          {user?.accountType || 'Sovra Sovereign Vault'}
         </div>
-        <div style={{
-          marginTop: '8px',
-          background: 'rgba(0, 168, 132, 0.12)',
-          border: '1px solid rgba(0, 168, 132, 0.3)',
-          borderRadius: '20px',
-          padding: '4px 14px',
-          fontSize: '11px',
-          fontWeight: '800',
-          color: '#00A884'
-        }}>
-          Tier 2 Regulated Account
-        </div>
+
+        <button
+          onClick={() => setIsEditing(s => !s)}
+          className="tap-spring"
+          style={{
+            marginTop: '10px',
+            background: 'rgba(0, 168, 132, 0.1)',
+            border: '1px solid rgba(0, 168, 132, 0.25)',
+            borderRadius: '20px',
+            padding: '5px 14px',
+            fontSize: '11px',
+            fontWeight: '700',
+            color: '#00A884',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}
+        >
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+          </svg>
+          {isEditing ? 'Close Editor' : 'Edit Profile & Name'}
+        </button>
+
+        {isEditing && (
+          <form
+            onSubmit={handleSaveProfile}
+            style={{
+              width: '100%',
+              background: '#FFFFFF',
+              border: '1px solid rgba(0, 168, 132, 0.2)',
+              borderRadius: '20px',
+              padding: '16px',
+              marginTop: '14px',
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px'
+            }}
+          >
+            <div>
+              <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
+                Profile Photo
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                style={{ fontSize: '11px', color: '#0F1F1B' }}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
+                Full Legal Name
+              </label>
+              <input
+                type="text"
+                value={editFullName}
+                onChange={e => setEditFullName(e.target.value)}
+                style={{
+                  width: '100%',
+                  height: '38px',
+                  borderRadius: '10px',
+                  border: '1px solid rgba(0, 168, 132, 0.25)',
+                  padding: '0 10px',
+                  fontSize: '12px',
+                  fontWeight: '600'
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '10px', fontWeight: '800', color: '#64748B', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
+                Home Greeting Name (e.g. "Hi, Ugwuanyi")
+              </label>
+              <input
+                type="text"
+                value={editFirstName}
+                onChange={e => setEditFirstName(e.target.value)}
+                style={{
+                  width: '100%',
+                  height: '38px',
+                  borderRadius: '10px',
+                  border: '1px solid rgba(0, 168, 132, 0.25)',
+                  padding: '0 10px',
+                  fontSize: '12px',
+                  fontWeight: '600'
+                }}
+              />
+              <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
+                {['Ugwuanyi', 'Annastesia', 'Anna'].map(name => (
+                  <button
+                    key={name}
+                    type="button"
+                    onClick={() => setEditFirstName(name)}
+                    style={{
+                      background: editFirstName === name ? '#00A884' : '#F1F5F9',
+                      color: editFirstName === name ? '#FFFFFF' : '#475569',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '4px 8px',
+                      fontSize: '10px',
+                      fontWeight: '700',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Hi, {name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSaving}
+              style={{
+                width: '100%',
+                height: '40px',
+                borderRadius: '12px',
+                border: 'none',
+                background: '#00A884',
+                color: '#FFFFFF',
+                fontSize: '12px',
+                fontWeight: '800',
+                cursor: 'pointer',
+                marginTop: '6px'
+              }}
+            >
+              {isSaving ? 'Saving...' : 'Save Profile Changes'}
+            </button>
+          </form>
+        )}
       </div>
 
       <button
@@ -898,7 +1064,11 @@ export default function App() {
       if (token) {
         try {
           const profileData = await api.getCurrentUser()
-          setUser(profileData.user)
+          const safeUser = {
+            ...profileData.user,
+            photoUrl: profileData.user?.photoUrl || (typeof localStorage !== 'undefined' ? localStorage.getItem('aura_registered_face') : null)
+          }
+          setUser(safeUser)
           setWallet(profileData.wallet)
           setBalance(profileData.wallet?.balance || 0)
           setIsAuthenticated(true)
@@ -920,7 +1090,11 @@ export default function App() {
 
   async function handleLoginSuccess(authResult) {
     if (authResult?.user) {
-      setUser(authResult.user)
+      const safeUser = {
+        ...authResult.user,
+        photoUrl: authResult.user?.photoUrl || (typeof localStorage !== 'undefined' ? localStorage.getItem('aura_registered_face') : null)
+      }
+      setUser(safeUser)
       setWallet(authResult.wallet)
       setBalance(authResult.wallet?.balance || 0)
       setIsAuthenticated(true)
@@ -1144,6 +1318,7 @@ export default function App() {
                   wallet={wallet}
                   onSignOut={handleSignOut}
                   onViewActivity={() => setActiveNav('activity')}
+                  onUpdateUser={setUser}
                 />
               )}
             </div>
