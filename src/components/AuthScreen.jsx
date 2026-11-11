@@ -7,8 +7,8 @@ import AuraLogo from './AuraLogo'
 export default function AuthScreen({ onLoginSuccess }) {
   const [mode, setMode] = useState('login')
   const [step, setStep] = useState('form')
-  const [email, setEmail] = useState('alex.morgan@sovra.io')
-  const [password, setPassword] = useState('password123')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [phone, setPhone] = useState('')
   const [bvn, setBvn] = useState('')
@@ -434,7 +434,7 @@ export default function AuthScreen({ onLoginSuccess }) {
             </label>
             <input
               type="email"
-              placeholder="alex.morgan@sovra.io"
+              placeholder="you@example.com"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required

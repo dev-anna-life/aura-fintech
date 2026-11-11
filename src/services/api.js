@@ -150,11 +150,26 @@ export const api = {
       cachedUser = cachedUserStr ? JSON.parse(cachedUserStr) : null
     } catch (e) {}
 
+    let fallbackFirstName = 'Member'
+    let fallbackFullName = 'Sovra Member'
+    if (isAnnastesia) {
+      fallbackFirstName = 'Annastesia'
+      fallbackFullName = 'Annastesia Amarachi Ugwuanyi'
+    } else if (cleanEmail) {
+      const handle = cleanEmail.split('@')[0]
+      const parts = handle.split(/[._-]/).filter(Boolean)
+      if (parts.length > 0) {
+        fallbackFirstName = parts[0].charAt(0).toUpperCase() + parts[0].slice(1)
+        fallbackFullName = parts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ')
+      }
+    }
+
     const user = cachedUser || {
       ...DEFAULT_USER,
-      name: isAnnastesia ? 'Annastesia Amarachi Ugwuanyi' : 'Alex Morgan',
-      firstName: isAnnastesia ? 'Annastesia' : 'Alex',
-      email: email || 'alex.morgan@sovra.io'
+      name: fallbackFullName,
+      firstName: fallbackFirstName,
+      email: email || 'member@sovra.io',
+      avatar: (fallbackFirstName[0] + (fallbackFullName.split(' ')[1]?.[0] || '')).toUpperCase()
     }
 
     localStorage.setItem('aura_cached_user', JSON.stringify(user))

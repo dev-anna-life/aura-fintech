@@ -49,9 +49,77 @@ function HomeScreen({
 
   return (
     <div style={{ padding: '14px 18px 88px', position: 'relative' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <AuraLogo size={28} showWordmark={true} light={true} />
+      {/* Streamlined Personal Dashboard Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        {/* Left: Dynamic User Profile Avatar & Greeting */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{
+            width: '42px',
+            height: '42px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #0B3D2E, #00A884)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '13px',
+            fontWeight: '800',
+            color: '#ffffff',
+            border: '2px solid #FFFFFF',
+            boxShadow: '0 4px 12px rgba(0, 168, 132, 0.22)',
+            overflow: 'hidden',
+            position: 'relative',
+            flexShrink: 0
+          }}>
+            {user?.photoUrl ? (
+              <img
+                src={user.photoUrl}
+                alt={user.firstName || 'User'}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              user?.avatar || (user?.firstName ? user.firstName[0].toUpperCase() : 'M')
+            )}
+            <div style={{
+              position: 'absolute',
+              bottom: '1px',
+              right: '1px',
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: '#00A884',
+              border: '2px solid #FFFFFF'
+            }} />
+          </div>
 
+          <div>
+            <div style={{ fontSize: '11px', fontWeight: '500', color: '#64748B', lineHeight: '1.2' }}>
+              {(() => {
+                const hour = new Date().getHours()
+                if (hour < 12) return 'Good morning,'
+                if (hour < 17) return 'Good afternoon,'
+                return 'Good evening,'
+              })()}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '1px' }}>
+              <span style={{ fontSize: '17px', fontWeight: '900', color: '#0F1F1B', letterSpacing: '-0.02em' }}>
+                Hi, {user?.firstName || (user?.name ? user.name.trim().split(' ')[0] : 'Member')}
+              </span>
+              <span style={{
+                background: 'rgba(0, 168, 132, 0.1)',
+                color: '#0B3D2E',
+                fontSize: '10px',
+                fontWeight: '700',
+                padding: '1px 6px',
+                borderRadius: '6px',
+                letterSpacing: '0.02em'
+              }}>
+                Tier 1
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Health Score Pill & Notifications Bell */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
             onClick={onOpenHealthScore}
@@ -60,7 +128,7 @@ function HomeScreen({
               background: '#FFFFFF',
               border: '1px solid rgba(0, 168, 132, 0.22)',
               borderRadius: '20px',
-              padding: '6px 12px',
+              padding: '6px 11px',
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
@@ -68,9 +136,9 @@ function HomeScreen({
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
             }}
           >
-            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00A884', boxShadow: '0 0 6px rgba(0, 168, 132, 0.6)' }} />
+            <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#00A884', boxShadow: '0 0 6px rgba(0, 168, 132, 0.6)' }} />
             <span style={{ fontSize: '11px', fontWeight: '800', color: '#0B3D2E' }}>
-              Health: 88/100
+              Health 88
             </span>
           </button>
 
@@ -80,8 +148,8 @@ function HomeScreen({
               background: '#FFFFFF',
               border: '1px solid rgba(0, 168, 132, 0.18)',
               borderRadius: '50%',
-              width: '40px',
-              height: '40px',
+              width: '38px',
+              height: '38px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -99,8 +167,8 @@ function HomeScreen({
                 position: 'absolute',
                 top: '-2px',
                 right: '-2px',
-                width: '16px',
-                height: '16px',
+                width: '15px',
+                height: '15px',
                 background: '#00A884',
                 borderRadius: '50%',
                 border: '2px solid #FFFFFF',
@@ -118,58 +186,8 @@ function HomeScreen({
         </div>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
-        <div>
-          <div style={{ fontSize: '13px', fontWeight: '500', color: '#64748B' }}>
-            Good morning,
-          </div>
-          <div style={{ fontSize: '24px', fontWeight: '900', color: '#0F1F1B', marginTop: '1px', letterSpacing: '-0.02em' }}>
-            Welcome back
-          </div>
-          <div style={{ fontSize: '12px', fontWeight: '600', color: '#00A884', marginTop: '3px' }}>
-            Your goals. Our priority.
-          </div>
-        </div>
-
-        <div style={{
-          width: '44px',
-          height: '44px',
-          borderRadius: '16px',
-          background: 'linear-gradient(135deg, #0B3D2E, #00A884)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '13px',
-          fontWeight: '800',
-          color: '#ffffff',
-          border: '1px solid rgba(0, 168, 132, 0.35)',
-          boxShadow: '0 4px 14px rgba(0, 168, 132, 0.25)',
-          overflow: 'hidden',
-          position: 'relative'
-        }}>
-          {user?.photoUrl ? (
-            <img
-              src={user.photoUrl}
-              alt={user.firstName || 'User'}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          ) : (
-            user.avatar || 'AM'
-          )}
-          <div style={{
-            position: 'absolute',
-            bottom: '2px',
-            right: '2px',
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            background: '#00A884',
-            border: '2px solid #FFFFFF'
-          }} />
-        </div>
-      </div>
-
-      <div style={{ marginBottom: '20px' }}>
+      {/* 1. Hero Balance Card */}
+      <div style={{ marginBottom: '16px' }}>
         <HeroBalanceCard
           balance={balance}
           hidden={hidden}
@@ -179,7 +197,18 @@ function HomeScreen({
         />
       </div>
 
-      <div style={{ marginBottom: '20px' }}>
+      {/* 2. Immediate Money Actions (Icon-Driven Grid) */}
+      <div style={{ marginBottom: '18px' }}>
+        <QuickActions
+          onRecord={onRecord}
+          onOpenBudgets={onOpenBudgets}
+          onOpenGoals={onOpenGoals}
+          onViewLedger={onViewAll}
+        />
+      </div>
+
+      {/* 3. Safe-To-Spend Intelligence Card */}
+      <div style={{ marginBottom: '18px' }}>
         <SafeToSpendCard
           balance={balance}
           currency={currency}
@@ -188,15 +217,6 @@ function HomeScreen({
           committedBills={committedBills}
           committedSavings={committedSavings}
           onOpenBudgets={onOpenBudgets}
-        />
-      </div>
-
-      <div style={{ marginBottom: '20px' }}>
-        <QuickActions
-          onRecord={onRecord}
-          onOpenBudgets={onOpenBudgets}
-          onOpenGoals={onOpenGoals}
-          onViewLedger={onViewAll}
         />
       </div>
 

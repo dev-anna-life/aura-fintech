@@ -175,10 +175,13 @@ export default function SafeToSpendCard({
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '10px', fontWeight: '800', color: '#0B3D2E', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                Dynamic GPS Recalibration
-              </span>
-              <span style={{ fontSize: '10px', fontWeight: '800', color: paceDifference < 0 ? '#0B3D2E' : '#00A884' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '800', color: '#0B3D2E' }}>
+                  Smart Daily Pace
+                </span>
+                <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#00A884' }} />
+              </div>
+              <span style={{ fontSize: '11px', fontWeight: '800', color: paceDifference < 0 ? '#0B3D2E' : '#00A884' }}>
                 {paceDifference < 0
                   ? `-${currencySymbol}${Math.abs(Math.round(paceDifference)).toLocaleString()}/day`
                   : `+${currencySymbol}${Math.abs(Math.round(paceDifference)).toLocaleString()}/day`}
@@ -186,8 +189,8 @@ export default function SafeToSpendCard({
             </div>
             <div style={{ fontSize: '10px', color: '#64748B', fontWeight: '500', marginTop: '1px' }}>
               {paceDifference < -5
-                ? `Allowance dynamically shifted across ${daysRemaining} days to protect rent and savings.`
-                : 'Daily pace on track. Bills and goal savings targets 100% protected.'}
+                ? `Recalibrated across ${daysRemaining} days to protect rent & goals.`
+                : `Balanced daily pace. Savings targets 100% guarded.`}
             </div>
           </div>
         </div>
@@ -196,7 +199,7 @@ export default function SafeToSpendCard({
       <div style={{ marginBottom: '14px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
           <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-            Uncommitted Liquidity
+            Safe Spending Buffer
           </span>
           <span style={{ fontSize: '11px', fontWeight: '800', color: '#0B3D2E' }}>
             {safePercent}% of Balance
