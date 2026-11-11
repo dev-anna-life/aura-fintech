@@ -7,7 +7,7 @@ export default function PhoneFrame({ children, islandAlert }) {
   const [time, setTime] = useState('')
   const [activeAlert, setActiveAlert] = useState(null)
   const [isExpanded, setIsExpanded] = useState(false)
-  const [desktopMode, setDesktopMode] = useState('phone') // 'phone' or 'web'
+  const [isNativeApp, setIsNativeApp] = useState(false)
 
   useEffect(() => {
     function tick() {
@@ -26,8 +26,8 @@ export default function PhoneFrame({ children, islandAlert }) {
       if (!containerRef.current) return
       const availableWidth = containerRef.current.clientWidth
       const availableHeight = containerRef.current.clientHeight
-      const targetWidth = 393 + 32
-      const targetHeight = 852 + 32
+      const targetWidth = 393 + 16
+      const targetHeight = 852 + 16
       const scaleX = availableWidth / targetWidth
       const scaleY = availableHeight / targetHeight
       const calculatedScale = Math.min(scaleX, scaleY, 1)
@@ -65,23 +65,14 @@ export default function PhoneFrame({ children, islandAlert }) {
     }
   }, [islandAlert])
 
-  const [isMobileScreen, setIsMobileScreen] = useState(false)
-
   useEffect(() => {
-    function checkMobile() {
-      const isMobile = window.innerWidth <= 600 ||
-        window.matchMedia('(display-mode: standalone)').matches ||
-        Boolean(window.Capacitor) ||
-        /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
-      setIsMobileScreen(isMobile)
-    }
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
+    // Detect if running inside the native compiled Android APK
+    const isNative = Boolean(window.Capacitor?.isNativePlatform?.())
+    setIsNativeApp(isNative)
   }, [])
 
-  // On real mobile screens (Android phone or iPhone Safari): fill edge-to-edge
-  if (isMobileScreen) {
+  // Inside the installed Android APK: run edge-to-edge with native status-bar breathing room
+  if (isNativeApp) {
     return (
       <div style={{
         width: '100%',
@@ -159,64 +150,7 @@ export default function PhoneFrame({ children, islandAlert }) {
     )
   }
 
-  // Desktop full-screen web mode (if user toggles)
-  if (desktopMode === 'web') {
-    return (
-      <div style={{
-        width: '100%',
-        height: '100vh',
-        background: '#F8FAF7',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        position: 'relative',
-        boxSizing: 'border-box'
-      }}>
-        {/* Mode Switcher Pill */}
-        <div style={{ position: 'fixed', top: '14px', right: '16px', zIndex: 1000 }}>
-          <button
-            onClick={() => setDesktopMode('phone')}
-            style={{
-              background: '#0B3D2E',
-              color: '#FFFFFF',
-              border: '1px solid rgba(0, 168, 132, 0.4)',
-              borderRadius: '20px',
-              padding: '6px 14px',
-              fontSize: '11px',
-              fontWeight: '700',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-            }}
-          >
-            <span>📱 Phone Frame</span>
-          </button>
-        </div>
-
-        <div style={{
-          flex: 1,
-          width: '100%',
-          maxWidth: '480px',
-          margin: '0 auto',
-          height: '100%',
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          scrollbarWidth: 'none',
-          position: 'relative',
-          boxSizing: 'border-box',
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
-          <style>{`div::-webkit-scrollbar { display: none; }`}</style>
-          {children}
-        </div>
-      </div>
-    )
-  }
-
-  // Default Desktop: Phone Frame Mockup for Screen Recording, Screenshots & Demos
+  // Web Version (Localhost, VS Code Preview, Vercel & iOS Web): Beautiful Phone Frame Style
   return (
     <div
       ref={containerRef}
@@ -232,30 +166,6 @@ export default function PhoneFrame({ children, islandAlert }) {
         boxSizing: 'border-box'
       }}
     >
-      {/* Mode Switcher Pill */}
-      <div style={{ position: 'fixed', top: '16px', right: '18px', zIndex: 1000 }}>
-        <button
-          onClick={() => setDesktopMode('web')}
-          style={{
-            background: 'rgba(255, 255, 255, 0.08)',
-            color: '#FFFFFF',
-            border: '1px solid rgba(255, 255, 255, 0.16)',
-            borderRadius: '20px',
-            padding: '6px 14px',
-            fontSize: '11px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            backdropFilter: 'blur(10px)',
-            transition: 'all 0.2s ease'
-          }}
-        >
-          <span>💻 Full Web</span>
-        </button>
-      </div>
-
       <div style={{
         transform: `scale(${scale})`,
         transformOrigin: 'center center',
