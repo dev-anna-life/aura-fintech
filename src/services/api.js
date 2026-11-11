@@ -49,6 +49,26 @@ const DEFAULT_BENEFICIARIES = [
   { id: 'ben_3', name: 'Chidi Nnamdi', bank: 'Zenith Bank', account: '0246813579' }
 ]
 
+// Client Account Vault for persistent credentials across mobile & web
+const ACCOUNTS_KEY = 'sovra_registered_accounts'
+
+function getStoredAccounts() {
+  try {
+    const raw = localStorage.getItem(ACCOUNTS_KEY)
+    return raw ? JSON.parse(raw) : {}
+  } catch (e) {
+    return {}
+  }
+}
+
+function saveStoredAccount(email, accountData) {
+  try {
+    const accounts = getStoredAccounts()
+    accounts[email.toLowerCase().trim()] = accountData
+    localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts))
+  } catch (e) {}
+}
+
 async function request(endpoint, options = {}) {
   const token = getToken()
   const headers = {
@@ -66,13 +86,17 @@ async function request(endpoint, options = {}) {
     const data = await response.json().catch(() => ({}))
 
     if (!response.ok) {
+      if (response.status === 404 || response.status === 502 || response.status === 503 || response.status === 405) {
+        console.warn(`[Sovra Standalone Mode] Endpoint ${endpoint} offline (${response.status}), switching to client vault fallback`)
+        return null
+      }
       throw new Error(data.error || 'Request failed')
     }
 
     return data
   } catch (err) {
-    // If it is a network error (e.g. running in standalone mobile APK without local server)
-    if (err.message && (err.message.includes('fetch') || err.message.includes('Network') || err.message.includes('Failed'))) {
+    // If it is a network error or offline fallback (e.g. running in standalone mobile APK or static Vercel)
+    if (err.message && (err.message.includes('fetch') || err.message.includes('Network') || err.message.includes('Failed') || err.message.includes('Request failed'))) {
       console.warn(`[Sovra Standalone Mode] Offline fallback for ${endpoint}`)
       return null
     }
@@ -97,23 +121,32 @@ export const api = {
       }
     }
 
-    // Standalone mobile fallback
-    const token = 'sovra_standalone_token'
+    // Standalone mobile & client vault registration
+    const token = 'sovra_token_' + Date.now()
     setToken(token)
+    const cleanEmail = email ? email.toLowerCase().trim() : 'member@sovra.io'
     const names = fullName ? fullName.trim().split(' ') : ['Member']
     const user = {
       id: `usr_${Date.now()}`,
       name: fullName || 'Sovra Member',
       firstName: names[0] || 'Member',
-      email: email || 'alex.morgan@sovra.io',
+      email: cleanEmail,
       phone: phone || '+234 904 809 5365',
       photoUrl: photoUrl || null,
-      avatar: names.map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'AM',
+      avatar: names.map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'M',
       accountType: 'Sovereign Wealth Tier',
       accountNumber: '80' + Math.floor(10000000 + Math.random() * 90000000).toString(),
       tier: 'Verified Sovereign',
       memberSince: 'Nov 2026'
     }
+
+    // Save account credentials to vault
+    saveStoredAccount(cleanEmail, {
+      user,
+      password,
+      wallet: DEFAULT_WALLET
+    })
+
     localStorage.setItem('aura_cached_user', JSON.stringify(user))
     return { token, user, wallet: DEFAULT_WALLET }
   },
@@ -132,24 +165,27 @@ export const api = {
         return data
       }
     } catch (err) {
-      if (!err.message?.includes('fetch') && !err.message?.includes('Network') && !err.message?.includes('Failed')) {
+      if (!err.message?.includes('fetch') && !err.message?.includes('Network') && !err.message?.includes('Failed') && !err.message?.includes('Request failed')) {
         throw err
       }
     }
 
-    // Standalone mobile fallback (enables instant login on phones with zero backend required)
-    const token = 'sovra_standalone_token'
+    // Standalone & client vault authentication
+    const token = 'sovra_token_' + Date.now()
     setToken(token)
 
     const cleanEmail = email ? email.toLowerCase().trim() : ''
+    const accounts = getStoredAccounts()
+    const storedAccount = accounts[cleanEmail]
+
+    // Verify passcode if account exists and not biometric
+    if (storedAccount && password && !isBiometric) {
+      if (storedAccount.password && storedAccount.password !== password) {
+        throw new Error('Incorrect master passcode. Please verify your passcode or reset it below.')
+      }
+    }
+
     const isAnnastesia = cleanEmail.includes('amarachi') || cleanEmail.includes('ugwuanyi')
-
-    const cachedUserStr = localStorage.getItem('aura_cached_user')
-    let cachedUser = null
-    try {
-      cachedUser = cachedUserStr ? JSON.parse(cachedUserStr) : null
-    } catch (e) {}
-
     let fallbackFirstName = 'Member'
     let fallbackFullName = 'Sovra Member'
     if (isAnnastesia) {
@@ -164,24 +200,82 @@ export const api = {
       }
     }
 
-    const user = cachedUser || {
+    const cachedUserStr = localStorage.getItem('aura_cached_user')
+    let cachedUser = null
+    try {
+      cachedUser = cachedUserStr ? JSON.parse(cachedUserStr) : null
+    } catch (e) {}
+
+    const user = storedAccount?.user || cachedUser || {
       ...DEFAULT_USER,
       name: fallbackFullName,
       firstName: fallbackFirstName,
-      email: email || 'member@sovra.io',
+      email: cleanEmail || 'member@sovra.io',
       avatar: (fallbackFirstName[0] + (fallbackFullName.split(' ')[1]?.[0] || '')).toUpperCase()
     }
 
+    // If first-time user with email and password, save credentials
+    if (!storedAccount && cleanEmail && password) {
+      saveStoredAccount(cleanEmail, {
+        user,
+        password,
+        wallet: DEFAULT_WALLET
+      })
+    }
+
     localStorage.setItem('aura_cached_user', JSON.stringify(user))
-    return { token, user, wallet: DEFAULT_WALLET }
+    return { token, user, wallet: storedAccount?.wallet || DEFAULT_WALLET }
   },
 
   async resetPassword({ email, newPassword }) {
-    const data = await request('/auth/reset-password', {
-      method: 'POST',
-      body: JSON.stringify({ email, newPassword })
-    })
-    return data || { success: true }
+    try {
+      const data = await request('/auth/reset-password', {
+        method: 'POST',
+        body: JSON.stringify({ email, newPassword })
+      })
+      if (data) return data
+    } catch (err) {
+      console.warn('[Sovra] Remote reset-password unavailable, updating local account vault')
+    }
+
+    // Client Vault Passcode Update
+    const cleanEmail = email ? email.toLowerCase().trim() : ''
+    const accounts = getStoredAccounts()
+    let account = accounts[cleanEmail]
+
+    if (account) {
+      account.password = newPassword
+      account.updatedAt = Date.now()
+      saveStoredAccount(cleanEmail, account)
+      if (account.user) {
+        localStorage.setItem('aura_cached_user', JSON.stringify(account.user))
+      }
+    } else {
+      const isAnnastesia = cleanEmail.includes('amarachi') || cleanEmail.includes('ugwuanyi')
+      const handle = cleanEmail.split('@')[0] || 'member'
+      const parts = handle.split(/[._-]/).filter(Boolean)
+      const firstName = isAnnastesia ? 'Annastesia' : (parts[0] ? parts[0].charAt(0).toUpperCase() + parts[0].slice(1) : 'Member')
+      const fullName = isAnnastesia ? 'Annastesia Amarachi Ugwuanyi' : parts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ') || 'Sovra Member'
+
+      const user = {
+        ...DEFAULT_USER,
+        id: `usr_${Date.now()}`,
+        name: fullName,
+        firstName,
+        email: cleanEmail,
+        avatar: (firstName[0] + (fullName.split(' ')[1]?.[0] || '')).toUpperCase()
+      }
+
+      account = {
+        user,
+        password: newPassword,
+        wallet: DEFAULT_WALLET
+      }
+      saveStoredAccount(cleanEmail, account)
+      localStorage.setItem('aura_cached_user', JSON.stringify(user))
+    }
+
+    return { success: true, message: 'Passcode updated successfully' }
   },
 
   async getCurrentUser() {

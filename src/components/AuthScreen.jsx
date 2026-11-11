@@ -39,9 +39,12 @@ export default function AuthScreen({ onLoginSuccess }) {
       setIsAuthenticating(true)
       setAuthStage('Updating security credentials...')
       api.resetPassword({ email: email.trim().toLowerCase(), newPassword: password })
-        .then(() => api.login({ email: email.trim().toLowerCase(), password }))
+        .then(() => {
+          setAuthStage('Passcode Updated! Signing in...')
+          return api.login({ email: email.trim().toLowerCase(), password })
+        })
         .then(result => {
-          setAuthStage('Passcode Updated : Banking Access Granted')
+          setAuthStage('Passcode Updated • Access Granted')
           setTimeout(() => {
             setIsAuthenticating(false)
             onLoginSuccess(result)
