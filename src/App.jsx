@@ -70,19 +70,15 @@ function HomeScreen({
             position: 'relative',
             flexShrink: 0
           }}>
-            {(() => {
-              const displayPhoto = user?.photoUrl || (typeof localStorage !== 'undefined' ? localStorage.getItem('aura_registered_face') : null)
-              if (displayPhoto) {
-                return (
-                  <img
-                    src={displayPhoto}
-                    alt={user?.firstName || 'User'}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                )
-              }
-              return user?.avatar || (user?.firstName ? user.firstName[0].toUpperCase() : 'U')
-            })()}
+            {user?.photoUrl ? (
+              <img
+                src={user.photoUrl}
+                alt={user?.firstName || 'User'}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              user?.avatar || (user?.firstName ? user.firstName[0].toUpperCase() : 'U')
+            )}
             <div style={{
               position: 'absolute',
               bottom: '1px',
@@ -484,7 +480,7 @@ function MoreScreen({ user, wallet, onSignOut, onViewActivity, onUpdateUser }) {
   const [editPhoto, setEditPhoto] = React.useState(null)
   const [isSaving, setIsSaving] = React.useState(false)
 
-  const displayPhoto = editPhoto || user?.photoUrl || (typeof localStorage !== 'undefined' ? localStorage.getItem('aura_registered_face') : null)
+  const displayPhoto = editPhoto || user?.photoUrl || null
 
   function handlePhotoUpload(e) {
     const file = e.target.files?.[0]
@@ -1064,11 +1060,7 @@ export default function App() {
       if (token) {
         try {
           const profileData = await api.getCurrentUser()
-          const safeUser = {
-            ...profileData.user,
-            photoUrl: profileData.user?.photoUrl || (typeof localStorage !== 'undefined' ? localStorage.getItem('aura_registered_face') : null)
-          }
-          setUser(safeUser)
+          setUser(profileData.user)
           setWallet(profileData.wallet)
           setBalance(profileData.wallet?.balance || 0)
           setIsAuthenticated(true)
@@ -1090,11 +1082,7 @@ export default function App() {
 
   async function handleLoginSuccess(authResult) {
     if (authResult?.user) {
-      const safeUser = {
-        ...authResult.user,
-        photoUrl: authResult.user?.photoUrl || (typeof localStorage !== 'undefined' ? localStorage.getItem('aura_registered_face') : null)
-      }
-      setUser(safeUser)
+      setUser(authResult.user)
       setWallet(authResult.wallet)
       setBalance(authResult.wallet?.balance || 0)
       setIsAuthenticated(true)

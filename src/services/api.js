@@ -37,9 +37,10 @@ const DEFAULT_USER = {
   email: 'annastesia@sovra.io',
   phone: '+234 904 809 5365',
   avatar: 'UA',
+  photoUrl: null,
   accountType: 'Sovereign Wealth Tier',
   accountNumber: '8029148201',
-  tier: 'Verified Sovereign',
+  tier: 'Standard Tier',
   memberSince: 'Nov 2026'
 }
 
@@ -70,12 +71,7 @@ function saveStoredAccount(email, accountData) {
 }
 
 function getActivePhoto(userPhoto) {
-  if (userPhoto) return userPhoto
-  try {
-    return localStorage.getItem('aura_registered_face') || null
-  } catch (e) {
-    return null
-  }
+  return userPhoto || null
 }
 
 function getPrimaryStoredUser() {
