@@ -1,4 +1,5 @@
 import { USER, TRANSACTIONS } from '../data/fintechData'
+import { supabase, isSupabaseConfigured } from './supabaseClient'
 
 const TOKEN_KEY = 'aura_auth_token'
 
@@ -137,6 +138,30 @@ async function request(endpoint, options = {}) {
 
 export const api = {
   async register({ fullName, email, password, phone, bvn, photoUrl }) {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data: supaData, error: supaErr } = await supabase.auth.signUp({
+          email: email.trim(),
+          password,
+          options: {
+            data: {
+              full_name: fullName,
+              first_name: fullName ? fullName.trim().split(' ')[0] : 'Ugwuanyi',
+              phone,
+              bvn,
+              photo_url: photoUrl || null
+            }
+          }
+        })
+        if (supaErr) throw supaErr
+        if (supaData && supaData.session) {
+          setToken(supaData.session.access_token)
+        }
+      } catch (err) {
+        console.warn('[Sovra Supabase] Registration fallback to local vault:', err.message)
+      }
+    }
+
     try {
       const data = await request('/auth/register', {
         method: 'POST',
@@ -188,6 +213,38 @@ export const api = {
   },
 
   async login({ email, password, isDemo, isBiometric }) {
+    if (isSupabaseConfigured && supabase && !isBiometric) {
+      try {
+        const { data: supaData, error: supaErr } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password
+        })
+        if (supaErr) throw supaErr
+        if (supaData && supaData.session) {
+          setToken(supaData.session.access_token)
+          const meta = supaData.user?.user_metadata || {}
+          const names = meta.full_name ? meta.full_name.trim().split(' ') : ['Ugwuanyi']
+          const user = {
+            id: supaData.user.id,
+            name: meta.full_name || 'Ugwuanyi Annastesia Amarachi',
+            firstName: meta.first_name || names[0] || 'Ugwuanyi',
+            email: supaData.user.email,
+            phone: meta.phone || '+234 904 809 5365',
+            photoUrl: meta.photo_url || null,
+            avatar: (names[0]?.[0] || 'U') + (names[1]?.[0] || 'A'),
+            accountType: 'Sovereign Wealth Tier',
+            accountNumber: '80' + supaData.user.id.replace(/\D/g, '').slice(0, 8),
+            tier: meta.bvn ? 'Tier 1' : 'Standard Tier',
+            memberSince: 'Nov 2026'
+          }
+          localStorage.setItem('aura_cached_user', JSON.stringify(user))
+          return { token: supaData.session.access_token, user, wallet: DEFAULT_WALLET }
+        }
+      } catch (err) {
+        console.warn('[Sovra Supabase] Login fallback to local vault:', err.message)
+      }
+    }
+
     try {
       const data = await request('/auth/login', {
         method: 'POST',
@@ -273,6 +330,14 @@ export const api = {
   },
 
   async resetPassword({ email, newPassword }) {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.auth.resetPasswordForEmail(email.trim())
+      } catch (err) {
+        console.warn('[Sovra Supabase] Reset password fallback:', err.message)
+      }
+    }
+
     try {
       const data = await request('/auth/reset-password', {
         method: 'POST',
@@ -360,6 +425,21 @@ export const api = {
   },
 
   async updateProfile({ name, firstName, phone, photoUrl }) {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.auth.updateUser({
+          data: {
+            full_name: name,
+            first_name: firstName,
+            phone,
+            photo_url: photoUrl
+          }
+        })
+      } catch (err) {
+        console.warn('[Sovra Supabase] Update profile fallback:', err.message)
+      }
+    }
+
     try {
       await request('/user/profile', {
         method: 'PUT',
