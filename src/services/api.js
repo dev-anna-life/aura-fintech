@@ -136,6 +136,26 @@ async function request(endpoint, options = {}) {
   }
 }
 
+async function uploadAvatarToSupabase(userId, dataUrl) {
+  if (!isSupabaseConfigured || !supabase || !dataUrl || !dataUrl.startsWith('data:')) return dataUrl
+  try {
+    const res = await fetch(dataUrl)
+    const blob = await res.blob()
+    const fileExt = dataUrl.split(';')[0].split('/')[1] || 'jpeg'
+    const fileName = `${userId || 'user'}_${Date.now()}.${fileExt}`
+    const { error } = await supabase.storage.from('avatars').upload(fileName, blob, {
+      contentType: `image/${fileExt}`,
+      upsert: true
+    })
+    if (error) throw error
+    const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(fileName)
+    return publicUrlData.publicUrl
+  } catch (e) {
+    console.warn('[Sovra Storage] Avatar upload fallback to dataUrl:', e.message)
+    return dataUrl
+  }
+}
+
 export const api = {
   async register({ fullName, email, password, phone, bvn, photoUrl }) {
     if (isSupabaseConfigured && supabase) {
@@ -154,8 +174,28 @@ export const api = {
           }
         })
         if (supaErr) throw supaErr
-        if (supaData && supaData.session) {
-          setToken(supaData.session.access_token)
+        if (supaData && supaData.user) {
+          const token = supaData.session?.access_token || 'sovra_token_' + Date.now()
+          setToken(token)
+          const meta = supaData.user.user_metadata || {}
+          const names = (meta.full_name || fullName || '').trim().split(' ')
+          const activePhoto = getActivePhoto(photoUrl || meta.photo_url)
+          const user = {
+            id: supaData.user.id,
+            name: meta.full_name || fullName || 'Ugwuanyi Annastesia Amarachi',
+            firstName: meta.first_name || names[0] || 'Ugwuanyi',
+            email: supaData.user.email || email.trim(),
+            phone: meta.phone || phone || '+234 904 809 5365',
+            photoUrl: activePhoto,
+            avatar: names.map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'UA',
+            accountType: 'Sovereign Wealth Tier',
+            accountNumber: '80' + Math.floor(10000000 + Math.random() * 90000000).toString(),
+            tier: bvn ? 'Tier 1' : 'Standard Tier',
+            memberSince: 'Nov 2026'
+          }
+          saveStoredAccount(user.email, { user, password, wallet: DEFAULT_WALLET })
+          localStorage.setItem('aura_cached_user', JSON.stringify(user))
+          return { token, user, wallet: DEFAULT_WALLET }
         }
       } catch (err) {
         console.warn('[Sovra Supabase] Registration fallback to local vault:', err.message)
@@ -224,20 +264,25 @@ export const api = {
           setToken(supaData.session.access_token)
           const meta = supaData.user?.user_metadata || {}
           const names = meta.full_name ? meta.full_name.trim().split(' ') : ['Ugwuanyi']
+          const activePhoto = getActivePhoto(meta.photo_url)
           const user = {
             id: supaData.user.id,
             name: meta.full_name || 'Ugwuanyi Annastesia Amarachi',
             firstName: meta.first_name || names[0] || 'Ugwuanyi',
             email: supaData.user.email,
             phone: meta.phone || '+234 904 809 5365',
-            photoUrl: meta.photo_url || null,
+            photoUrl: activePhoto,
             avatar: (names[0]?.[0] || 'U') + (names[1]?.[0] || 'A'),
             accountType: 'Sovereign Wealth Tier',
-            accountNumber: '80' + supaData.user.id.replace(/\D/g, '').slice(0, 8),
+            accountNumber: '80' + (supaData.user.id.replace(/\D/g, '') + '12345678').slice(0, 8),
             tier: meta.bvn ? 'Tier 1' : 'Standard Tier',
             memberSince: 'Nov 2026'
           }
+          if (activePhoto) {
+            localStorage.setItem('aura_registered_face', activePhoto)
+          }
           localStorage.setItem('aura_cached_user', JSON.stringify(user))
+          saveStoredAccount(user.email, { user, password, wallet: DEFAULT_WALLET })
           return { token: supaData.session.access_token, user, wallet: DEFAULT_WALLET }
         }
       } catch (err) {
@@ -425,6 +470,16 @@ export const api = {
   },
 
   async updateProfile({ name, firstName, phone, photoUrl }) {
+    let cloudPhotoUrl = photoUrl
+    if (photoUrl && photoUrl.startsWith('data:') && isSupabaseConfigured && supabase) {
+      try {
+        const currentUser = (await supabase.auth.getUser())?.data?.user
+        cloudPhotoUrl = await uploadAvatarToSupabase(currentUser?.id, photoUrl)
+      } catch (e) {
+        console.warn('[Sovra Supabase] Photo upload fallback:', e)
+      }
+    }
+
     if (isSupabaseConfigured && supabase) {
       try {
         await supabase.auth.updateUser({
@@ -432,7 +487,7 @@ export const api = {
             full_name: name,
             first_name: firstName,
             phone,
-            photo_url: photoUrl
+            photo_url: cloudPhotoUrl || photoUrl
           }
         })
       } catch (err) {
@@ -453,17 +508,18 @@ export const api = {
       existing = existingStr ? JSON.parse(existingStr) : {}
     } catch (e) {}
 
+    const activePhoto = getActivePhoto(cloudPhotoUrl || photoUrl)
     const updatedUser = {
       ...DEFAULT_USER,
       ...existing,
       ...(name ? { name } : {}),
       ...(firstName ? { firstName } : {}),
       ...(phone ? { phone } : {}),
-      ...(photoUrl ? { photoUrl } : {})
+      ...(activePhoto !== undefined ? { photoUrl: activePhoto } : {})
     }
 
-    if (photoUrl) {
-      localStorage.setItem('aura_registered_face', photoUrl)
+    if (activePhoto) {
+      localStorage.setItem('aura_registered_face', activePhoto)
     }
     localStorage.setItem('aura_cached_user', JSON.stringify(updatedUser))
 
@@ -581,5 +637,8 @@ export const api = {
 
   logout() {
     clearToken()
+    if (isSupabaseConfigured && supabase) {
+      supabase.auth.signOut().catch(() => {})
+    }
   }
 }
