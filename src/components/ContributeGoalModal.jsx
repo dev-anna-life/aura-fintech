@@ -7,7 +7,7 @@ export default function ContributeGoalModal({ goal, balance = 0, currency = 'NGN
   const exchangeRate = 160
   const currencySymbol = isUSD ? '$' : '₦'
 
-  const mainBalanceNgn = balance ? balance * exchangeRate : 1250000
+  const mainBalanceNgn = balance ? balance * exchangeRate : 1516000
   const mainBalanceDisplay = isUSD ? mainBalanceNgn / exchangeRate : mainBalanceNgn
 
   const savedDisplay = isUSD ? goal.savedNgn / exchangeRate : goal.savedNgn

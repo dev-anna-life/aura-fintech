@@ -17,12 +17,12 @@ export function clearToken() {
 }
 
 const DEFAULT_WALLET = {
-  balance: 7812.50,
+  balance: 9475,
   currency: 'USD',
   accountNumber: '8029148201',
   cardLast4: '4820',
   cardExpiry: '08/29',
-  cardholderName: 'ALEX MORGAN',
+  cardholderName: 'UGWUANYI A. AMARACHI',
   isFrozen: false,
   cryptoHoldings: {
     USDT: 1500,
@@ -35,10 +35,10 @@ const DEFAULT_USER = {
   id: 'usr_default_01',
   name: 'Ugwuanyi Annastesia Amarachi',
   firstName: 'Ugwuanyi',
-  email: 'annastesia@sovra.io',
+  email: 'ugwuanyiannastesiaa@gmail.com',
   phone: '+234 904 809 5365',
   avatar: 'UA',
-  photoUrl: null,
+  photoUrl: 'https://fotphofqwzpcfyxsziip.supabase.co/storage/v1/object/public/avatars/user_1794563869305.jpeg',
   accountType: 'Sovereign Wealth Tier',
   accountNumber: '8029148201',
   tier: 'Standard Tier',
@@ -71,8 +71,17 @@ function saveStoredAccount(email, accountData) {
   } catch (e) {}
 }
 
+const CLOUD_AVATAR = 'https://fotphofqwzpcfyxsziip.supabase.co/storage/v1/object/public/avatars/user_1794563869305.jpeg'
+
 function getActivePhoto(userPhoto) {
-  return userPhoto || null
+  if (userPhoto && typeof userPhoto === 'string') {
+    return userPhoto
+  }
+  try {
+    const registeredFace = typeof localStorage !== 'undefined' ? localStorage.getItem('aura_registered_face') : null
+    if (registeredFace) return registeredFace
+  } catch (e) {}
+  return CLOUD_AVATAR
 }
 
 function getPrimaryStoredUser() {
@@ -461,7 +470,16 @@ export const api = {
       parsedUser = getPrimaryStoredUser() || DEFAULT_USER
     }
     if (parsedUser) {
+      if (parsedUser.firstName === 'Annastesia' || parsedUser.firstName === 'Anna' || !parsedUser.firstName) {
+        parsedUser.firstName = 'Ugwuanyi'
+      }
+      if (!parsedUser.name || parsedUser.name.toLowerCase().includes('alex')) {
+        parsedUser.name = 'Ugwuanyi Annastesia Amarachi'
+      }
       parsedUser.photoUrl = getActivePhoto(parsedUser.photoUrl)
+      try {
+        localStorage.setItem('aura_cached_user', JSON.stringify(parsedUser))
+      } catch (e) {}
     }
     return {
       user: parsedUser,

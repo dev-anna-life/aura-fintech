@@ -14,7 +14,7 @@ export default function SafeToSpendCard({
   const isUSD = currency === 'USD'
   const exchangeRate = 160
 
-  const totalBalanceNgn = balance ? balance * exchangeRate : 1250000
+  const totalBalanceNgn = balance ? balance * exchangeRate : 1516000
   const billsNgn = committedBills
   const savingsNgn = committedSavings
 

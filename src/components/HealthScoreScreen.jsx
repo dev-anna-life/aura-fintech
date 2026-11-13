@@ -15,7 +15,7 @@ export default function HealthScoreScreen({
   const exchangeRate = 160
   const currencySymbol = isUSD ? '$' : '₦'
 
-  const totalBalanceNgn = balance ? balance * exchangeRate : 1250000
+  const totalBalanceNgn = balance ? balance * exchangeRate : 1516000
   const billsNgn = committedBills
   const savingsNgn = committedSavings
 
