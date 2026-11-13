@@ -9,7 +9,7 @@ export default function HeroBalanceCard({
 }) {
   const ngnAmount = currency === 'NGN'
     ? (balance ? (balance * 160).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '1,516,000.00')
-    : (balance ? balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '12,480.87')
+    : (balance ? balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '9,475.00')
 
   const currencySymbol = currency === 'NGN' ? '₦' : '$'
 

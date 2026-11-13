@@ -35,7 +35,7 @@ const DEFAULT_USER = {
   id: 'usr_default_01',
   name: 'Ugwuanyi Annastesia Amarachi',
   firstName: 'Ugwuanyi',
-  email: 'ugwuanyiannastesiaa@gmail.com',
+  email: 'annastesia@sovra.io',
   phone: '+234 904 809 5365',
   avatar: 'UA',
   photoUrl: 'https://fotphofqwzpcfyxsziip.supabase.co/storage/v1/object/public/avatars/user_1794563869305.jpeg',
@@ -456,6 +456,41 @@ export const api = {
   },
 
   async getCurrentUser() {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data: supaAuth } = await supabase.auth.getUser()
+        if (supaAuth && supaAuth.user) {
+          const meta = supaAuth.user.user_metadata || {}
+          const names = meta.full_name ? meta.full_name.trim().split(' ') : ['Ugwuanyi']
+          const activePhoto = getActivePhoto(meta.photo_url)
+          const user = {
+            id: supaAuth.user.id,
+            name: meta.full_name || 'Ugwuanyi Annastesia Amarachi',
+            firstName: meta.first_name || names[0] || 'Ugwuanyi',
+            email: supaAuth.user.email,
+            phone: meta.phone || '+234 904 809 5365',
+            photoUrl: activePhoto,
+            avatar: (names[0]?.[0] || 'U') + (names[1]?.[0] || 'A'),
+            accountType: 'Sovereign Wealth Tier',
+            accountNumber: '80' + (supaAuth.user.id.replace(/\D/g, '') + '12345678').slice(0, 8),
+            tier: meta.bvn ? 'Tier 1' : 'Standard Tier',
+            memberSince: 'Nov 2026'
+          }
+          if (activePhoto) {
+            localStorage.setItem('aura_registered_face', activePhoto)
+          }
+          localStorage.setItem('aura_cached_user', JSON.stringify(user))
+          const storedWallet = localStorage.getItem('aura_cached_wallet')
+          return {
+            user,
+            wallet: storedWallet ? JSON.parse(storedWallet) : DEFAULT_WALLET
+          }
+        }
+      } catch (err) {
+        console.warn('[Sovra Supabase] getCurrentUser fallback:', err.message)
+      }
+    }
+
     const data = await request('/user/me')
     if (data && data.user) {
       data.user.photoUrl = getActivePhoto(data.user.photoUrl)
