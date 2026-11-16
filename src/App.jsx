@@ -21,6 +21,7 @@ import SafeToSpendCard from './components/SafeToSpendCard'
 import BudgetsScreen from './components/BudgetsScreen'
 import GoalsScreen from './components/GoalsScreen'
 import HealthScoreScreen from './components/HealthScoreScreen'
+import LandingPage from './components/LandingPage'
 import { api, getToken } from './services/api'
 import { USER, TRANSACTIONS, formatTransactionDate } from './data/fintechData'
 
@@ -473,7 +474,7 @@ function WalletScreen({ user, balance, wallet, hidden, isFrozen, onToggleFreeze,
   )
 }
 
-function MoreScreen({ user, wallet, onSignOut, onViewActivity, onUpdateUser }) {
+function MoreScreen({ user, wallet, onSignOut, onViewActivity, onUpdateUser, onViewLanding }) {
   const [isEditing, setIsEditing] = React.useState(false)
   const [editFullName, setEditFullName] = React.useState(user?.name || 'Ugwuanyi Annastesia Amarachi')
   const [editFirstName, setEditFirstName] = React.useState(user?.firstName || 'Ugwuanyi')
@@ -762,6 +763,27 @@ function MoreScreen({ user, wallet, onSignOut, onViewActivity, onUpdateUser }) {
         ))}
       </div>
 
+      {onViewLanding && (
+        <button
+          onClick={onViewLanding}
+          className="tap-spring"
+          style={{
+            width: '100%',
+            padding: '13px',
+            borderRadius: '16px',
+            border: '1px solid rgba(0, 98, 255, 0.4)',
+            background: 'rgba(0, 98, 255, 0.08)',
+            color: '#0062FF',
+            fontSize: '13px',
+            fontWeight: '700',
+            cursor: 'pointer',
+            marginBottom: '10px'
+          }}
+        >
+          View Public Landing Page →
+        </button>
+      )}
+
       <button
         onClick={onSignOut}
         className="tap-spring"
@@ -831,6 +853,18 @@ const NAV_ITEMS = [
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [currentView, setCurrentView] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname.toLowerCase()
+      if (path.includes('signup') || path.includes('signin') || path.includes('auth')) return 'auth'
+      if (path.includes('app') || path.includes('dashboard')) return 'app'
+    }
+    return 'landing'
+  })
+  const [authInitialMode, setAuthInitialMode] = useState(() => {
+    if (typeof window !== 'undefined' && window.location.pathname.toLowerCase().includes('signup')) return 'register'
+    return 'login'
+  })
   const [user, setUser] = useState(USER)
   const [wallet, setWallet] = useState(null)
   const [balance, setBalance] = useState(USER.balance)
@@ -1064,6 +1098,7 @@ export default function App() {
           setWallet(profileData.wallet)
           setBalance(profileData.wallet?.balance || 0)
           setIsAuthenticated(true)
+          setCurrentView('app')
 
           const [txData, benData] = await Promise.all([
             api.getTransactions().catch(() => ({ transactions: [] })),
@@ -1074,6 +1109,7 @@ export default function App() {
         } catch (e) {
           api.logout()
           setIsAuthenticated(false)
+          setCurrentView('landing')
         }
       }
     }
@@ -1086,6 +1122,7 @@ export default function App() {
       setWallet(authResult.wallet)
       setBalance(authResult.wallet?.balance || 0)
       setIsAuthenticated(true)
+      setCurrentView('app')
 
       try {
         const [txData, benData] = await Promise.all([
@@ -1108,6 +1145,7 @@ export default function App() {
   function handleSignOut() {
     api.logout()
     setIsAuthenticated(false)
+    setCurrentView('landing')
     setActiveNav('home')
   }
 
@@ -1240,6 +1278,33 @@ export default function App() {
     } catch (e) {}
   }
 
+  if (!isAuthenticated && currentView === 'landing') {
+    return (
+      <LandingPage
+        onGetStarted={() => {
+          setAuthInitialMode('register')
+          setCurrentView('auth')
+        }}
+        onSignIn={() => {
+          setAuthInitialMode('login')
+          setCurrentView('auth')
+        }}
+        onExploreFeatures={() => {
+          const el = document.getElementById('features')
+          if (el) el.scrollIntoView({ behavior: 'smooth' })
+        }}
+        onOpenAbout={() => {
+          const el = document.getElementById('why-sovra')
+          if (el) el.scrollIntoView({ behavior: 'smooth' })
+        }}
+        onOpenContact={() => {
+          const el = document.getElementById('faq')
+          if (el) el.scrollIntoView({ behavior: 'smooth' })
+        }}
+      />
+    )
+  }
+
   return (
     <PhoneFrame islandAlert={islandAlert}>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', maxWidth: '100%', minWidth: 0, boxSizing: 'border-box', background: '#F8FAF7', position: 'relative', overflow: 'hidden' }}>
@@ -1254,7 +1319,11 @@ export default function App() {
           </defs>
         </svg>
         {!isAuthenticated ? (
-          <AuthScreen onLoginSuccess={handleLoginSuccess} />
+          <AuthScreen
+            onLoginSuccess={handleLoginSuccess}
+            initialMode={authInitialMode}
+            onBackToLanding={() => setCurrentView('landing')}
+          />
         ) : (
           <>
             <div style={{ flex: 1, width: '100%', maxWidth: '100%', minWidth: 0, boxSizing: 'border-box', overflowY: 'auto', overflowX: 'hidden', scrollbarWidth: 'none' }}>
@@ -1307,6 +1376,7 @@ export default function App() {
                   onSignOut={handleSignOut}
                   onViewActivity={() => setActiveNav('activity')}
                   onUpdateUser={setUser}
+                  onViewLanding={() => setCurrentView('landing')}
                 />
               )}
             </div>

@@ -4,8 +4,8 @@ import LiveFaceScanner from './LiveFaceScanner'
 import BiometricEnrollment from './BiometricEnrollment'
 import AuraLogo from './AuraLogo'
 
-export default function AuthScreen({ onLoginSuccess }) {
-  const [mode, setMode] = useState('login')
+export default function AuthScreen({ onLoginSuccess, initialMode = 'login', onBackToLanding }) {
+  const [mode, setMode] = useState(initialMode)
   const [step, setStep] = useState('form')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -199,6 +199,28 @@ export default function AuthScreen({ onLoginSuccess }) {
         flexDirection: 'column',
         animation: 'springSheet 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
       }}>
+        {onBackToLanding && (
+          <div style={{ marginBottom: '14px', display: 'flex', alignItems: 'center' }}>
+            <button
+              type="button"
+              onClick={onBackToLanding}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#0062FF',
+                fontSize: '12px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '4px 0'
+              }}
+            >
+              <span>←</span> Back to Home
+            </button>
+          </div>
+        )}
         {mode === 'reset' ? (
           <div style={{
             display: 'flex',
