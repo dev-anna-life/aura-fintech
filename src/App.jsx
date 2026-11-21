@@ -1098,7 +1098,10 @@ export default function App() {
           setWallet(profileData.wallet)
           setBalance(profileData.wallet?.balance || 0)
           setIsAuthenticated(true)
-          setCurrentView('app')
+          const path = typeof window !== 'undefined' ? window.location.pathname.toLowerCase() : ''
+          if (path.includes('app') || path.includes('dashboard')) {
+            setCurrentView('app')
+          }
 
           const [txData, benData] = await Promise.all([
             api.getTransactions().catch(() => ({ transactions: [] })),
@@ -1278,16 +1281,27 @@ export default function App() {
     } catch (e) {}
   }
 
-  if (!isAuthenticated && currentView === 'landing') {
+  if (currentView === 'landing') {
     return (
       <LandingPage
+        isAuthenticated={isAuthenticated}
+        user={user}
+        onGoToDashboard={() => setCurrentView('app')}
         onGetStarted={() => {
-          setAuthInitialMode('register')
-          setCurrentView('auth')
+          if (isAuthenticated) {
+            setCurrentView('app')
+          } else {
+            setAuthInitialMode('register')
+            setCurrentView('auth')
+          }
         }}
         onSignIn={() => {
-          setAuthInitialMode('login')
-          setCurrentView('auth')
+          if (isAuthenticated) {
+            setCurrentView('app')
+          } else {
+            setAuthInitialMode('login')
+            setCurrentView('auth')
+          }
         }}
         onExploreFeatures={() => {
           const el = document.getElementById('features')

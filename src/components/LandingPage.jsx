@@ -5,7 +5,10 @@ export default function LandingPage({
   onSignIn,
   onExploreFeatures,
   onOpenAbout,
-  onOpenContact
+  onOpenContact,
+  isAuthenticated,
+  user,
+  onGoToDashboard
 }) {
   const [openFaq, setOpenFaq] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -103,52 +106,85 @@ export default function LandingPage({
 
           {/* Auth Actions */}
           <div className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <button
-              onClick={onSignIn}
-              style={{
-                background: 'transparent',
-                border: '1px solid rgba(255, 255, 255, 0.35)',
-                color: '#FFFFFF',
-                borderRadius: '9999px',
-                padding: '9px 22px',
-                fontSize: '13px',
-                fontWeight: '700',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = '#0062FF'}
-              onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.35)'}
-            >
-              Sign In
-            </button>
-            <button
-              onClick={onGetStarted}
-              style={{
-                background: '#0062FF',
-                border: 'none',
-                color: '#FFFFFF',
-                borderRadius: '9999px',
-                padding: '10px 24px',
-                fontSize: '13px',
-                fontWeight: '700',
-                cursor: 'pointer',
-                boxShadow: '0 4px 16px rgba(0, 98, 255, 0.4)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = '#0052D9'
-                e.currentTarget.style.transform = 'translateY(-1px)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = '#0062FF'
-                e.currentTarget.style.transform = 'translateY(0)'
-              }}
-            >
-              Get Started <span style={{ fontSize: '15px' }}>→</span>
-            </button>
+            {isAuthenticated ? (
+              <button
+                onClick={onGoToDashboard || onGetStarted}
+                style={{
+                  background: '#0062FF',
+                  border: 'none',
+                  color: '#FFFFFF',
+                  borderRadius: '9999px',
+                  padding: '10px 24px',
+                  fontSize: '13px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 16px rgba(0, 98, 255, 0.4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = '#0052D9'
+                  e.currentTarget.style.transform = 'translateY(-1px)'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = '#0062FF'
+                  e.currentTarget.style.transform = 'translateY(0)'
+                }}
+              >
+                Go to Dashboard ({user?.firstName || 'Vault'}) <span style={{ fontSize: '15px' }}>→</span>
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={onSignIn}
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid rgba(255, 255, 255, 0.35)',
+                    color: '#FFFFFF',
+                    borderRadius: '9999px',
+                    padding: '9px 22px',
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = '#0062FF'}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.35)'}
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={onGetStarted}
+                  style={{
+                    background: '#0062FF',
+                    border: 'none',
+                    color: '#FFFFFF',
+                    borderRadius: '9999px',
+                    padding: '10px 24px',
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 16px rgba(0, 98, 255, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = '#0052D9'
+                    e.currentTarget.style.transform = 'translateY(-1px)'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = '#0062FF'
+                    e.currentTarget.style.transform = 'translateY(0)'
+                  }}
+                >
+                  Get Started <span style={{ fontSize: '15px' }}>→</span>
+                </button>
+              </>
+            )}
           </div>
 
           {/* Mobile Hamburger Button */}
@@ -189,36 +225,56 @@ export default function LandingPage({
             <button onClick={onOpenAbout ? onOpenAbout : () => scrollToSection('why-sovra')} style={mobileNavLinkStyle}>About</button>
             <button onClick={() => scrollToSection('faq')} style={mobileNavLinkStyle}>FAQ</button>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '10px', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
-              <button
-                onClick={() => { setMobileMenuOpen(false); onSignIn(); }}
-                style={{
-                  background: 'transparent',
-                  border: '1px solid rgba(255, 255, 255, 0.35)',
-                  color: '#FFFFFF',
-                  borderRadius: '12px',
-                  padding: '12px',
-                  fontSize: '14px',
-                  fontWeight: '700',
-                  cursor: 'pointer'
-                }}
-              >
-                Sign In
-              </button>
-              <button
-                onClick={() => { setMobileMenuOpen(false); onGetStarted(); }}
-                style={{
-                  background: '#0062FF',
-                  border: 'none',
-                  color: '#FFFFFF',
-                  borderRadius: '12px',
-                  padding: '12px',
-                  fontSize: '14px',
-                  fontWeight: '700',
-                  cursor: 'pointer'
-                }}
-              >
-                Get Started Free →
-              </button>
+              {isAuthenticated ? (
+                <button
+                  onClick={() => { setMobileMenuOpen(false); (onGoToDashboard || onGetStarted)(); }}
+                  style={{
+                    background: '#0062FF',
+                    border: 'none',
+                    color: '#FFFFFF',
+                    borderRadius: '12px',
+                    padding: '12px',
+                    fontSize: '14px',
+                    fontWeight: '700',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Go to Dashboard ({user?.firstName || 'Vault'}) →
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); onSignIn(); }}
+                    style={{
+                      background: 'transparent',
+                      border: '1px solid rgba(255, 255, 255, 0.35)',
+                      color: '#FFFFFF',
+                      borderRadius: '12px',
+                      padding: '12px',
+                      fontSize: '14px',
+                      fontWeight: '700',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); onGetStarted(); }}
+                    style={{
+                      background: '#0062FF',
+                      border: 'none',
+                      color: '#FFFFFF',
+                      borderRadius: '12px',
+                      padding: '12px',
+                      fontSize: '14px',
+                      fontWeight: '700',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Get Started Free →
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}
