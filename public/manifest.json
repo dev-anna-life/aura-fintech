@@ -7,8 +7,8 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#F8FAF7",
-  "theme_color": "#00A884",
+  "background_color": "#040B22",
+  "theme_color": "#0062FF",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -33,12 +33,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    },
-    {
-      "src": "/aura-logo.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
     }
   ]
 }

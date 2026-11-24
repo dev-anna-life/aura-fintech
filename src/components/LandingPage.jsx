@@ -77,19 +77,16 @@ export default function LandingPage({
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
           >
-            {/* S Mark Logo */}
-            <div style={{
-              width: '34px',
-              height: '34px',
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, #0062FF 0%, #00C6FF 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(0, 98, 255, 0.4)'
-            }}>
-              <span style={{ color: '#FFFFFF', fontWeight: '900', fontSize: '18px', fontStyle: 'italic', letterSpacing: '-0.05em' }}>S</span>
-            </div>
+            <img
+              src="/sovra-logo.png"
+              alt="Sovra"
+              style={{
+                width: '36px',
+                height: '36px',
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 2px 10px rgba(0, 98, 255, 0.45))'
+              }}
+            />
             <span style={{ fontSize: '22px', fontWeight: '800', color: '#FFFFFF', letterSpacing: '-0.02em' }}>
               Sovra
             </span>
@@ -327,7 +324,7 @@ export default function LandingPage({
               marginBottom: '32px',
               maxWidth: '460px'
             }}>
-              Sovra helps you track spending, plan better, and save consistently — all in one place.
+              Sovra helps you track spending, plan better, and save consistently - all in one place.
             </p>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '14px' }}>
@@ -430,9 +427,7 @@ export default function LandingPage({
                     borderRight: '1px solid rgba(255, 255, 255, 0.08)'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-                      <div style={{ width: '18px', height: '18px', borderRadius: '5px', background: '#0062FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ color: '#fff', fontSize: '10px', fontWeight: '900' }}>S</span>
-                      </div>
+                      <img src="/sovra-logo.png" alt="Sovra" style={{ width: '18px', height: '18px', objectFit: 'contain' }} />
                       <span style={{ color: '#fff', fontSize: '12px', fontWeight: '800' }}>Sovra</span>
                     </div>
 
@@ -705,7 +700,10 @@ export default function LandingPage({
                 color: '#0F172A'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <div style={{ fontSize: '11px', fontWeight: '800', color: '#0062FF' }}>S Sovra</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <img src="/sovra-logo.png" alt="Sovra" style={{ width: '14px', height: '14px', objectFit: 'contain' }} />
+                    <span style={{ fontSize: '11px', fontWeight: '800', color: '#0062FF' }}>Sovra</span>
+                  </div>
                   <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: '#0062FF', color: '#fff', fontSize: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>UA</div>
                 </div>
 
@@ -945,9 +943,16 @@ export default function LandingPage({
         }}>
           {/* Brand */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '24px', height: '24px', borderRadius: '7px', background: '#0062FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ color: '#fff', fontSize: '13px', fontWeight: '900', fontStyle: 'italic' }}>S</span>
-            </div>
+            <img
+              src="/sovra-logo.png"
+              alt="Sovra"
+              style={{
+                width: '26px',
+                height: '26px',
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 2px 6px rgba(0, 98, 255, 0.4))'
+              }}
+            />
             <span style={{ fontSize: '18px', fontWeight: '800', color: '#FFFFFF' }}>Sovra</span>
           </div>
 
