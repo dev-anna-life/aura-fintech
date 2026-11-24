@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 export default function LandingPage({
   onGetStarted,
@@ -12,6 +12,24 @@ export default function LandingPage({
 }) {
   const [openFaq, setOpenFaq] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible')
+          }
+        })
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -30px 0px' }
+    )
+
+    const elements = document.querySelectorAll('.sovra-reveal')
+    elements.forEach((el) => observer.observe(el))
+
+    return () => observer.disconnect()
+  }, [])
 
   const faqs = [
     {
@@ -105,6 +123,7 @@ export default function LandingPage({
           <div className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             {isAuthenticated ? (
               <button
+                className="sovra-btn-primary"
                 onClick={onGoToDashboard || onGetStarted}
                 style={{
                   background: '#0062FF',
@@ -118,16 +137,7 @@ export default function LandingPage({
                   boxShadow: '0 4px 16px rgba(0, 98, 255, 0.4)',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = '#0052D9'
-                  e.currentTarget.style.transform = 'translateY(-1px)'
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = '#0062FF'
-                  e.currentTarget.style.transform = 'translateY(0)'
+                  gap: '6px'
                 }}
               >
                 Go to Dashboard ({user?.firstName || 'Vault'}) <span style={{ fontSize: '15px' }}>→</span>
@@ -135,6 +145,7 @@ export default function LandingPage({
             ) : (
               <>
                 <button
+                  className="sovra-btn-secondary"
                   onClick={onSignIn}
                   style={{
                     background: 'transparent',
@@ -144,15 +155,13 @@ export default function LandingPage({
                     padding: '9px 22px',
                     fontSize: '13px',
                     fontWeight: '700',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
+                    cursor: 'pointer'
                   }}
-                  onMouseEnter={e => e.currentTarget.style.borderColor = '#0062FF'}
-                  onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.35)'}
                 >
                   Sign In
                 </button>
                 <button
+                  className="sovra-btn-primary"
                   onClick={onGetStarted}
                   style={{
                     background: '#0062FF',
@@ -166,16 +175,7 @@ export default function LandingPage({
                     boxShadow: '0 4px 16px rgba(0, 98, 255, 0.4)',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
-                    transition: 'all 0.2s ease'
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.background = '#0052D9'
-                    e.currentTarget.style.transform = 'translateY(-1px)'
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.background = '#0062FF'
-                    e.currentTarget.style.transform = 'translateY(0)'
+                    gap: '6px'
                   }}
                 >
                   Get Started <span style={{ fontSize: '15px' }}>→</span>
@@ -329,6 +329,7 @@ export default function LandingPage({
 
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '14px' }}>
               <button
+                className="sovra-btn-primary"
                 onClick={onGetStarted}
                 style={{
                   background: '#0062FF',
@@ -342,22 +343,14 @@ export default function LandingPage({
                   boxShadow: '0 8px 24px rgba(0, 98, 255, 0.45)',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  transition: 'all 0.25s ease'
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = '#0052D9'
-                  e.currentTarget.style.transform = 'translateY(-2px)'
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = '#0062FF'
-                  e.currentTarget.style.transform = 'translateY(0)'
+                  gap: '8px'
                 }}
               >
                 Get Started Free →
               </button>
 
               <button
+                className="sovra-btn-secondary"
                 onClick={() => scrollToSection('features')}
                 style={{
                   background: 'rgba(255, 255, 255, 0.06)',
@@ -367,11 +360,8 @@ export default function LandingPage({
                   padding: '14px 28px',
                   fontSize: '14px',
                   fontWeight: '700',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
+                  cursor: 'pointer'
                 }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = '#0062FF'}
-                onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)'}
               >
                 Explore Features
               </button>
@@ -386,7 +376,7 @@ export default function LandingPage({
             alignItems: 'center'
           }}>
             {/* Glowing Backdrop */}
-            <div style={{
+            <div className="sovra-glow-pulse" style={{
               position: 'absolute',
               width: '85%',
               height: '85%',
@@ -397,7 +387,7 @@ export default function LandingPage({
             }} />
 
             {/* Laptop Hardware Frame */}
-            <div style={{
+            <div className="sovra-float-laptop" style={{
               position: 'relative',
               width: '100%',
               maxWidth: '520px',
@@ -449,7 +439,8 @@ export default function LandingPage({
                   <div style={{ flex: 1, background: '#F8FAFC', padding: '14px 16px' }}>
                     {/* Header */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span className="sovra-pulse-dot" title="Live Sync Active" />
                         <div style={{ fontSize: '12px', fontWeight: '800', color: '#0F172A' }}>Good morning, Anna 👋</div>
                       </div>
                       <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#0062FF', color: '#fff', fontSize: '10px', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -538,7 +529,7 @@ export default function LandingPage({
       {/* =========================================================================
           3. WHY SOVRA SECTION (Clean White Canvas)
       ========================================================================= */}
-      <section id="why-sovra" style={{ padding: '80px 24px', maxWidth: '1240px', margin: '0 auto' }}>
+      <section id="why-sovra" className="sovra-reveal" style={{ padding: '80px 24px', maxWidth: '1240px', margin: '0 auto' }}>
         <div style={{ textAlign: 'left', marginBottom: '48px', maxWidth: '600px' }}>
           <div style={pillBadgeStyle}>Why Sovra?</div>
           <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: '900', color: '#0F172A', letterSpacing: '-0.03em', margin: '12px 0 10px' }}>
@@ -556,7 +547,7 @@ export default function LandingPage({
           gap: '24px'
         }}>
           {/* Card 1 */}
-          <div style={featureCardStyle}>
+          <div className="sovra-interactive-card" style={featureCardStyle}>
             <div style={iconBoxStyle}>
               <svg width="22" height="22" fill="none" stroke="#0062FF" strokeWidth="2.4" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M18 20V10M12 20V4M6 20v-6" />
@@ -569,7 +560,7 @@ export default function LandingPage({
           </div>
 
           {/* Card 2 */}
-          <div style={featureCardStyle}>
+          <div className="sovra-interactive-card" style={featureCardStyle}>
             <div style={iconBoxStyle}>
               <svg width="22" height="22" fill="none" stroke="#0062FF" strokeWidth="2.4" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -582,7 +573,7 @@ export default function LandingPage({
           </div>
 
           {/* Card 3 */}
-          <div style={featureCardStyle}>
+          <div className="sovra-interactive-card" style={featureCardStyle}>
             <div style={iconBoxStyle}>
               <svg width="22" height="22" fill="none" stroke="#0062FF" strokeWidth="2.4" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -599,7 +590,7 @@ export default function LandingPage({
       {/* =========================================================================
           4. HOW IT WORKS SECTION (3 Simple Steps)
       ========================================================================= */}
-      <section id="how-it-works" style={{ padding: '70px 24px 90px', background: '#F8FAFC' }}>
+      <section id="how-it-works" className="sovra-reveal" style={{ padding: '70px 24px 90px', background: '#F8FAFC' }}>
         <div style={{ maxWidth: '1080px', margin: '0 auto', textAlign: 'center' }}>
           <div style={pillBadgeStyle}>How It Works</div>
           <h2 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', fontWeight: '900', color: '#0F172A', letterSpacing: '-0.02em', margin: '14px 0 48px' }}>
@@ -613,22 +604,22 @@ export default function LandingPage({
             position: 'relative'
           }}>
             {/* Step 1 */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-              <div style={stepCircleStyle}>1</div>
+            <div className="sovra-step-item" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+              <div className="sovra-step-badge" style={stepCircleStyle}>1</div>
               <h4 style={{ fontSize: '17px', fontWeight: '800', color: '#0F172A', marginBottom: '4px' }}>Create Account</h4>
               <p style={{ fontSize: '13px', color: '#64748B', maxWidth: '200px' }}>Sign up in minutes with your name and email.</p>
             </div>
 
             {/* Step 2 */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-              <div style={stepCircleStyle}>2</div>
+            <div className="sovra-step-item" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+              <div className="sovra-step-badge" style={stepCircleStyle}>2</div>
               <h4 style={{ fontSize: '17px', fontWeight: '800', color: '#0F172A', marginBottom: '4px' }}>Set Your Goals</h4>
               <p style={{ fontSize: '13px', color: '#64748B', maxWidth: '200px' }}>Plan for what matters and shield your rent.</p>
             </div>
 
             {/* Step 3 */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-              <div style={stepCircleStyle}>3</div>
+            <div className="sovra-step-item" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+              <div className="sovra-step-badge" style={stepCircleStyle}>3</div>
               <h4 style={{ fontSize: '17px', fontWeight: '800', color: '#0F172A', marginBottom: '4px' }}>Start Managing</h4>
               <p style={{ fontSize: '13px', color: '#64748B', maxWidth: '200px' }}>Track, save and grow with total peace of mind.</p>
             </div>
@@ -639,7 +630,7 @@ export default function LandingPage({
       {/* =========================================================================
           5. CROSS-DEVICE COMPANION SECTION (Laptop + Mobile Phone)
       ========================================================================= */}
-      <section style={{ padding: '80px 24px', maxWidth: '1240px', margin: '0 auto' }}>
+      <section className="sovra-reveal" style={{ padding: '80px 24px', maxWidth: '1240px', margin: '0 auto' }}>
         <div style={{
           background: 'radial-gradient(ellipse at 90% 50%, rgba(0, 98, 255, 0.3) 0%, transparent 70%), #040B22',
           borderRadius: '28px',
@@ -664,6 +655,7 @@ export default function LandingPage({
               A clean and easy-to-use dashboard across all your devices. Real-time balance updates and intelligent pacing on laptop, tablet, and mobile.
             </p>
             <button
+              className="sovra-btn-primary"
               onClick={onGetStarted}
               style={{
                 background: '#0062FF',
@@ -684,7 +676,7 @@ export default function LandingPage({
           {/* Right Dual Device Mockup */}
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
             {/* Phone Frame */}
-            <div style={{
+            <div className="sovra-float-phone" style={{
               width: '240px',
               borderRadius: '28px',
               padding: '8px',
@@ -714,7 +706,10 @@ export default function LandingPage({
                   color: '#fff',
                   marginBottom: '10px'
                 }}>
-                  <div style={{ fontSize: '9px', color: '#94A3B8' }}>Total Balance</div>
+                  <div style={{ fontSize: '9px', color: '#94A3B8', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <span>Total Balance</span>
+                    <span className="sovra-pulse-dot" style={{ width: '6px', height: '6px' }} />
+                  </div>
                   <div style={{ fontSize: '16px', fontWeight: '900', margin: '2px 0 6px' }}>₦520,000.00</div>
                   <div style={{ fontSize: '9px', color: '#38BDF8', fontWeight: '700' }}>↑ 12% vs last month</div>
                 </div>
@@ -736,8 +731,8 @@ export default function LandingPage({
       {/* =========================================================================
           6. SECURITY MATTERS BANNER
       ========================================================================= */}
-      <section style={{ padding: '0 24px 70px', maxWidth: '1240px', margin: '0 auto' }}>
-        <div style={{
+      <section className="sovra-reveal" style={{ padding: '0 24px 70px', maxWidth: '1240px', margin: '0 auto' }}>
+        <div className="sovra-interactive-card" style={{
           background: '#F0F6FE',
           borderRadius: '20px',
           padding: '24px 32px',
@@ -795,7 +790,7 @@ export default function LandingPage({
       {/* =========================================================================
           7. FAQ ACCORDION SECTION
       ========================================================================= */}
-      <section id="faq" style={{ padding: '70px 24px', maxWidth: '1240px', margin: '0 auto' }}>
+      <section id="faq" className="sovra-reveal" style={{ padding: '70px 24px', maxWidth: '1240px', margin: '0 auto' }}>
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
@@ -812,6 +807,7 @@ export default function LandingPage({
               Find answers to common questions about Sovra, NUBAN accounts, and security.
             </p>
             <button
+              className="sovra-btn-secondary"
               onClick={onOpenContact ? onOpenContact : () => scrollToSection('contact')}
               style={{
                 background: 'transparent',
@@ -835,12 +831,12 @@ export default function LandingPage({
               return (
                 <div
                   key={index}
+                  className="sovra-faq-card"
                   style={{
                     border: '1px solid #E2E8F0',
                     borderRadius: '14px',
                     padding: '16px 20px',
                     background: isOpen ? '#F8FAFC' : '#FFFFFF',
-                    transition: 'all 0.2s ease',
                     cursor: 'pointer'
                   }}
                   onClick={() => toggleFaq(index)}
@@ -849,27 +845,40 @@ export default function LandingPage({
                     <span style={{ fontSize: '15px', fontWeight: '700', color: '#0F172A' }}>
                       {faq.q}
                     </span>
-                    <span style={{
-                      fontSize: '18px',
-                      fontWeight: '700',
-                      color: '#0062FF',
-                      marginLeft: '12px'
-                    }}>
-                      {isOpen ? '−' : '+'}
+                    <span
+                      className="sovra-faq-indicator"
+                      style={{
+                        fontSize: '20px',
+                        fontWeight: '700',
+                        color: '#0062FF',
+                        marginLeft: '12px',
+                        display: 'inline-block',
+                        transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)'
+                      }}
+                    >
+                      +
                     </span>
                   </div>
-                  {isOpen && (
-                    <p style={{
-                      marginTop: '12px',
-                      fontSize: '13px',
-                      color: '#64748B',
-                      lineHeight: '1.6',
-                      borderTop: '1px solid #E2E8F0',
-                      paddingTop: '10px'
-                    }}>
-                      {faq.a}
-                    </p>
-                  )}
+                  <div
+                    className="sovra-faq-drawer"
+                    style={{
+                      gridTemplateRows: isOpen ? '1fr' : '0fr',
+                      opacity: isOpen ? 1 : 0
+                    }}
+                  >
+                    <div style={{ overflow: 'hidden' }}>
+                      <p style={{
+                        marginTop: '12px',
+                        fontSize: '13px',
+                        color: '#64748B',
+                        lineHeight: '1.6',
+                        borderTop: '1px solid #E2E8F0',
+                        paddingTop: '10px'
+                      }}>
+                        {faq.a}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )
             })}
@@ -880,7 +889,7 @@ export default function LandingPage({
       {/* =========================================================================
           8. READY TO TAKE CONTROL BANNER
       ========================================================================= */}
-      <section style={{ padding: '0 24px 80px', maxWidth: '1240px', margin: '0 auto' }}>
+      <section className="sovra-reveal" style={{ padding: '0 24px 80px', maxWidth: '1240px', margin: '0 auto' }}>
         <div style={{
           background: 'linear-gradient(135deg, #040B22 0%, #0A1B44 100%)',
           borderRadius: '24px',
@@ -903,6 +912,7 @@ export default function LandingPage({
           </div>
 
           <button
+            className="sovra-btn-primary"
             onClick={onGetStarted}
             style={{
               background: '#0062FF',

@@ -6,6 +6,10 @@
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html, body, #root {
   min-height: 100%;
   width: 100%;
@@ -157,4 +161,176 @@ html, body, #root {
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
+}
+
+/* =========================================================================
+   SOVRA REFINED FINTECH MOTION SYSTEM
+   Natural, silky smooth, non-distracting interactions
+   ========================================================================= */
+
+@keyframes sovra-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes sovra-float-phone {
+  0%, 100% {
+    transform: rotate(-2deg) translateY(0px);
+  }
+  50% {
+    transform: rotate(-1.5deg) translateY(-10px);
+  }
+}
+
+@keyframes sovra-glow-pulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes sovra-pulse-dot {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 98, 255, 0.65);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(0, 98, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 98, 255, 0);
+  }
+}
+
+@keyframes sovra-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.sovra-float-laptop {
+  animation: sovra-float 6s ease-in-out infinite;
+  will-change: transform;
+}
+
+.sovra-float-phone {
+  animation: sovra-float-phone 5.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+.sovra-glow-pulse {
+  animation: sovra-glow-pulse 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.sovra-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #38BDF8;
+  display: inline-block;
+  animation: sovra-pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.sovra-interactive-card {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.35s ease,
+              background-color 0.35s ease;
+  will-change: transform, box-shadow;
+}
+
+.sovra-interactive-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 35px -10px rgba(0, 98, 255, 0.12), 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 98, 255, 0.35) !important;
+}
+
+.sovra-step-item {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sovra-step-item:hover {
+  transform: translateY(-4px);
+}
+
+.sovra-step-item:hover .sovra-step-badge {
+  transform: scale(1.1);
+  box-shadow: 0 8px 20px rgba(0, 98, 255, 0.55) !important;
+}
+
+.sovra-step-badge {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.sovra-btn-primary {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.2s ease;
+}
+
+.sovra-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 98, 255, 0.5) !important;
+  background-color: #0052D9 !important;
+}
+
+.sovra-btn-primary:active {
+  transform: translateY(0px) scale(0.975);
+}
+
+.sovra-btn-secondary {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s ease,
+              background-color 0.2s ease;
+}
+
+.sovra-btn-secondary:hover {
+  transform: translateY(-2px);
+  border-color: #0062FF !important;
+  background-color: rgba(0, 98, 255, 0.08) !important;
+}
+
+.sovra-btn-secondary:active {
+  transform: translateY(0px) scale(0.975);
+}
+
+.sovra-faq-card {
+  transition: border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.sovra-faq-card:hover {
+  border-color: rgba(0, 98, 255, 0.35) !important;
+  box-shadow: 0 6px 18px rgba(0, 98, 255, 0.06);
+}
+
+.sovra-faq-indicator {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sovra-faq-drawer {
+  display: grid;
+  transition: grid-template-rows 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+}
+
+.sovra-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.sovra-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
