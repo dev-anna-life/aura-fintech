@@ -14,6 +14,14 @@ export default function LandingPage({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
+    // On mobile screens, immediately reveal everything for zero-latency scrolling
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+      document.querySelectorAll('.sovra-reveal').forEach((el) => {
+        el.classList.add('is-visible')
+      })
+      return
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -22,7 +30,7 @@ export default function LandingPage({
           }
         })
       },
-      { threshold: 0.12, rootMargin: '0px 0px -30px 0px' }
+      { threshold: 0.05, rootMargin: '120px 0px 60px 0px' }
     )
 
     const elements = document.querySelectorAll('.sovra-reveal')
@@ -280,38 +288,30 @@ export default function LandingPage({
       {/* =========================================================================
           2. HERO SECTION (Dark Navy with 3D Laptop Preview)
       ========================================================================= */}
-      <section style={{
+      <section className="hero-section" style={{
         background: 'radial-gradient(ellipse at 80% 20%, rgba(0, 98, 255, 0.22) 0%, transparent 60%), #040B22',
         position: 'relative',
-        paddingTop: '64px',
-        paddingBottom: '90px',
         overflow: 'hidden'
       }}>
-        <div style={{
+        <div className="hero-grid" style={{
           maxWidth: '1240px',
           margin: '0 auto',
-          padding: '0 24px',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          alignItems: 'center',
-          gap: '48px'
+          width: '100%'
         }}>
           {/* Left Hero Content */}
-          <div style={{ maxWidth: '560px' }}>
-            <h1 style={{
-              fontSize: 'clamp(36px, 5vw, 56px)',
+          <div className="hero-text-col">
+            <h1 className="hero-h1" style={{
               fontWeight: '900',
-              lineHeight: '1.12',
               color: '#FFFFFF',
               letterSpacing: '-0.03em',
               marginBottom: '20px'
             }}>
-              Take control <br />
-              of your money. <br />
+              Take control of your money.{' '}
               <span style={{
                 background: 'linear-gradient(90deg, #0095FF 0%, #38BDF8 100%)',
                 WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
+                WebkitTextFillColor: 'transparent',
+                display: 'inline-block'
               }}>
                 Build a better future.
               </span>
@@ -321,13 +321,12 @@ export default function LandingPage({
               fontSize: '16px',
               lineHeight: '1.6',
               color: 'rgba(255, 255, 255, 0.72)',
-              marginBottom: '32px',
-              maxWidth: '460px'
+              marginBottom: '32px'
             }}>
               Sovra helps you track spending, plan better, and save consistently - all in one place.
             </p>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '14px' }}>
+            <div className="hero-btn-group">
               <button
                 className="sovra-btn-primary"
                 onClick={onGetStarted}
@@ -369,7 +368,7 @@ export default function LandingPage({
           </div>
 
           {/* Right Hero Visual: 3D Laptop Dashboard */}
-          <div style={{
+          <div className="laptop-mockup-wrapper" style={{
             position: 'relative',
             display: 'flex',
             justifyContent: 'center',
@@ -405,13 +404,12 @@ export default function LandingPage({
                 border: '1px solid #334155'
               }}>
                 {/* Inside Screen Content (Sovra Desktop Web Dashboard) */}
-                <div style={{ display: 'flex', minHeight: '300px' }}>
+                <div style={{ display: 'flex', minHeight: '260px' }}>
                   {/* Mini Sidebar */}
-                  <div style={{
+                  <div className="laptop-sidebar" style={{
                     width: '110px',
                     background: '#040B22',
                     padding: '14px 10px',
-                    display: 'flex',
                     flexDirection: 'column',
                     gap: '12px',
                     borderRight: '1px solid rgba(255, 255, 255, 0.08)'
@@ -520,7 +518,7 @@ export default function LandingPage({
           overflow: 'hidden',
           lineHeight: 0
         }}>
-          <svg viewBox="0 0 1440 80" fill="none" style={{ width: '100%', height: 'auto', display: 'block' }}>
+          <svg viewBox="0 0 1440 80" preserveAspectRatio="none" fill="none" style={{ width: '100%', height: '36px', display: 'block' }}>
             <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#FFFFFF" />
           </svg>
         </div>
@@ -529,10 +527,10 @@ export default function LandingPage({
       {/* =========================================================================
           3. WHY SOVRA SECTION (Clean White Canvas)
       ========================================================================= */}
-      <section id="why-sovra" className="sovra-reveal" style={{ padding: '80px 24px', maxWidth: '1240px', margin: '0 auto' }}>
-        <div style={{ textAlign: 'left', marginBottom: '48px', maxWidth: '600px' }}>
+      <section id="why-sovra" className="why-sovra-section sovra-reveal" style={{ maxWidth: '1240px', margin: '0 auto' }}>
+        <div className="why-sovra-header" style={{ maxWidth: '600px' }}>
           <div style={pillBadgeStyle}>Why Sovra?</div>
-          <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: '900', color: '#0F172A', letterSpacing: '-0.03em', margin: '12px 0 10px' }}>
+          <h2 style={{ fontSize: 'clamp(26px, 4vw, 42px)', fontWeight: '900', color: '#0F172A', letterSpacing: '-0.03em', margin: '12px 0 10px' }}>
             Managing money <br />should be simple.
           </h2>
           <p style={{ fontSize: '15px', color: '#64748B', lineHeight: '1.6' }}>
@@ -541,11 +539,7 @@ export default function LandingPage({
         </div>
 
         {/* 3 Value Cards Grid */}
-        <div id="features" style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '24px'
-        }}>
+        <div id="features" className="why-sovra-grid">
           {/* Card 1 */}
           <div className="sovra-interactive-card" style={featureCardStyle}>
             <div style={iconBoxStyle}>
@@ -590,38 +584,33 @@ export default function LandingPage({
       {/* =========================================================================
           4. HOW IT WORKS SECTION (3 Simple Steps)
       ========================================================================= */}
-      <section id="how-it-works" className="sovra-reveal" style={{ padding: '70px 24px 90px', background: '#F8FAFC' }}>
+      <section id="how-it-works" className="how-it-works-section sovra-reveal" style={{ background: '#F8FAFC' }}>
         <div style={{ maxWidth: '1080px', margin: '0 auto', textAlign: 'center' }}>
           <div style={pillBadgeStyle}>How It Works</div>
-          <h2 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', fontWeight: '900', color: '#0F172A', letterSpacing: '-0.02em', margin: '14px 0 48px' }}>
+          <h2 style={{ fontSize: 'clamp(24px, 3.5vw, 38px)', fontWeight: '900', color: '#0F172A', letterSpacing: '-0.02em', margin: '14px 0 40px' }}>
             Get started in just 3 simple steps.
           </h2>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: '32px',
-            position: 'relative'
-          }}>
+          <div className="how-it-works-grid" style={{ position: 'relative' }}>
             {/* Step 1 */}
             <div className="sovra-step-item" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
               <div className="sovra-step-badge" style={stepCircleStyle}>1</div>
               <h4 style={{ fontSize: '17px', fontWeight: '800', color: '#0F172A', marginBottom: '4px' }}>Create Account</h4>
-              <p style={{ fontSize: '13px', color: '#64748B', maxWidth: '200px' }}>Sign up in minutes with your name and email.</p>
+              <p style={{ fontSize: '13px', color: '#64748B', maxWidth: '240px' }}>Sign up in minutes with your name and email.</p>
             </div>
 
             {/* Step 2 */}
             <div className="sovra-step-item" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
               <div className="sovra-step-badge" style={stepCircleStyle}>2</div>
               <h4 style={{ fontSize: '17px', fontWeight: '800', color: '#0F172A', marginBottom: '4px' }}>Set Your Goals</h4>
-              <p style={{ fontSize: '13px', color: '#64748B', maxWidth: '200px' }}>Plan for what matters and shield your rent.</p>
+              <p style={{ fontSize: '13px', color: '#64748B', maxWidth: '240px' }}>Plan for what matters and shield your rent.</p>
             </div>
 
             {/* Step 3 */}
             <div className="sovra-step-item" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
               <div className="sovra-step-badge" style={stepCircleStyle}>3</div>
               <h4 style={{ fontSize: '17px', fontWeight: '800', color: '#0F172A', marginBottom: '4px' }}>Start Managing</h4>
-              <p style={{ fontSize: '13px', color: '#64748B', maxWidth: '200px' }}>Track, save and grow with total peace of mind.</p>
+              <p style={{ fontSize: '13px', color: '#64748B', maxWidth: '240px' }}>Track, save and grow with total peace of mind.</p>
             </div>
           </div>
         </div>
@@ -630,32 +619,26 @@ export default function LandingPage({
       {/* =========================================================================
           5. CROSS-DEVICE COMPANION SECTION (Laptop + Mobile Phone)
       ========================================================================= */}
-      <section className="sovra-reveal" style={{ padding: '80px 24px', maxWidth: '1240px', margin: '0 auto' }}>
-        <div style={{
+      <section className="companion-section sovra-reveal" style={{ maxWidth: '1240px', margin: '0 auto' }}>
+        <div className="companion-card" style={{
           background: 'radial-gradient(ellipse at 90% 50%, rgba(0, 98, 255, 0.3) 0%, transparent 70%), #040B22',
-          borderRadius: '28px',
-          padding: 'clamp(32px, 5vw, 64px)',
           color: '#FFFFFF',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          alignItems: 'center',
-          gap: '40px',
           overflow: 'hidden',
           boxShadow: '0 20px 50px -10px rgba(4, 11, 34, 0.4)'
         }}>
           {/* Left Text */}
-          <div>
+          <div style={{ maxWidth: '100%' }}>
             <div style={{ ...pillBadgeStyle, background: 'rgba(0, 98, 255, 0.25)', color: '#38BDF8', border: '1px solid rgba(0, 98, 255, 0.4)' }}>
               Your Financial Companion
             </div>
-            <h2 style={{ fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: '900', color: '#FFFFFF', letterSpacing: '-0.03em', margin: '14px 0 12px' }}>
+            <h2 style={{ fontSize: 'clamp(26px, 4vw, 44px)', fontWeight: '900', color: '#FFFFFF', letterSpacing: '-0.03em', margin: '14px 0 12px' }}>
               A smarter way <br />to manage your money.
             </h2>
-            <p style={{ fontSize: '15px', color: 'rgba(255, 255, 255, 0.72)', lineHeight: '1.6', marginBottom: '28px', maxWidth: '420px' }}>
+            <p style={{ fontSize: '15px', color: 'rgba(255, 255, 255, 0.72)', lineHeight: '1.6', marginBottom: '28px', maxWidth: '440px' }}>
               A clean and easy-to-use dashboard across all your devices. Real-time balance updates and intelligent pacing on laptop, tablet, and mobile.
             </p>
             <button
-              className="sovra-btn-primary"
+              className="sovra-btn-primary companion-btn"
               onClick={onGetStarted}
               style={{
                 background: '#0062FF',
@@ -674,16 +657,17 @@ export default function LandingPage({
           </div>
 
           {/* Right Dual Device Mockup */}
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', width: '100%' }}>
             {/* Phone Frame */}
             <div className="sovra-float-phone" style={{
               width: '240px',
+              maxWidth: '100%',
               borderRadius: '28px',
               padding: '8px',
               background: '#0F172A',
               border: '2px solid rgba(255, 255, 255, 0.25)',
               boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
-              transform: 'rotate(-2deg)'
+              margin: '0 auto'
             }}>
               <div style={{
                 borderRadius: '20px',
@@ -731,24 +715,17 @@ export default function LandingPage({
       {/* =========================================================================
           6. SECURITY MATTERS BANNER
       ========================================================================= */}
-      <section className="sovra-reveal" style={{ padding: '0 24px 70px', maxWidth: '1240px', margin: '0 auto' }}>
-        <div className="sovra-interactive-card" style={{
+      <section className="security-section sovra-reveal" style={{ maxWidth: '1240px', margin: '0 auto' }}>
+        <div className="security-banner sovra-interactive-card" style={{
           background: '#F0F6FE',
-          borderRadius: '20px',
-          padding: '24px 32px',
-          border: '1px solid #D0E2FD',
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '24px'
+          border: '1px solid #D0E2FD'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             {/* Padlock Icon */}
             <div style={{
-              width: '52px',
-              height: '52px',
-              borderRadius: '16px',
+              width: '48px',
+              height: '48px',
+              borderRadius: '14px',
               background: '#0062FF',
               display: 'flex',
               alignItems: 'center',
@@ -756,7 +733,7 @@ export default function LandingPage({
               boxShadow: '0 6px 16px rgba(0, 98, 255, 0.3)',
               flexShrink: 0
             }}>
-              <svg width="24" height="24" fill="none" stroke="#FFFFFF" strokeWidth="2.2" viewBox="0 0 24 24">
+              <svg width="22" height="22" fill="none" stroke="#FFFFFF" strokeWidth="2.2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
@@ -765,7 +742,7 @@ export default function LandingPage({
               <div style={{ ...pillBadgeStyle, padding: '3px 10px', fontSize: '11px', marginBottom: '4px' }}>
                 Your Security Matters
               </div>
-              <h3 style={{ fontSize: '18px', fontWeight: '800', color: '#0F172A', marginBottom: '2px' }}>
+              <h3 style={{ fontSize: '17px', fontWeight: '800', color: '#0F172A', marginBottom: '2px' }}>
                 Your data. Our priority.
               </h3>
               <p style={{ fontSize: '13px', color: '#64748B' }}>
@@ -774,13 +751,10 @@ export default function LandingPage({
             </div>
           </div>
 
-          <div style={{
-            fontSize: '15px',
+          <div className="security-banner-right" style={{
             fontWeight: '800',
             color: '#0F172A',
-            letterSpacing: '0.02em',
-            borderLeft: '2px solid #D0E2FD',
-            paddingLeft: '24px'
+            letterSpacing: '0.02em'
           }}>
             Private. Secure. Reliable.
           </div>
@@ -790,20 +764,15 @@ export default function LandingPage({
       {/* =========================================================================
           7. FAQ ACCORDION SECTION
       ========================================================================= */}
-      <section id="faq" className="sovra-reveal" style={{ padding: '70px 24px', maxWidth: '1240px', margin: '0 auto' }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: '48px',
-          alignItems: 'start'
-        }}>
+      <section id="faq" className="faq-section sovra-reveal" style={{ maxWidth: '1240px', margin: '0 auto' }}>
+        <div className="faq-grid" style={{ alignItems: 'start' }}>
           {/* Left Column */}
           <div>
             <div style={pillBadgeStyle}>FAQs</div>
-            <h2 style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: '900', color: '#0F172A', letterSpacing: '-0.02em', margin: '14px 0 10px' }}>
+            <h2 style={{ fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: '900', color: '#0F172A', letterSpacing: '-0.02em', margin: '14px 0 10px' }}>
               Got questions?
             </h2>
-            <p style={{ fontSize: '15px', color: '#64748B', lineHeight: '1.6', marginBottom: '24px', maxWidth: '340px' }}>
+            <p style={{ fontSize: '15px', color: '#64748B', lineHeight: '1.6', marginBottom: '24px', maxWidth: '380px' }}>
               Find answers to common questions about Sovra, NUBAN accounts, and security.
             </p>
             <button
@@ -889,17 +858,10 @@ export default function LandingPage({
       {/* =========================================================================
           8. READY TO TAKE CONTROL BANNER
       ========================================================================= */}
-      <section className="sovra-reveal" style={{ padding: '0 24px 80px', maxWidth: '1240px', margin: '0 auto' }}>
-        <div style={{
+      <section className="cta-section sovra-reveal" style={{ maxWidth: '1240px', margin: '0 auto' }}>
+        <div className="cta-banner" style={{
           background: 'linear-gradient(135deg, #040B22 0%, #0A1B44 100%)',
-          borderRadius: '24px',
-          padding: 'clamp(28px, 4vw, 44px)',
           color: '#FFFFFF',
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '24px',
           boxShadow: '0 16px 40px rgba(4, 11, 34, 0.3)'
         }}>
           <div>
@@ -912,7 +874,7 @@ export default function LandingPage({
           </div>
 
           <button
-            className="sovra-btn-primary"
+            className="sovra-btn-primary cta-btn"
             onClick={onGetStarted}
             style={{
               background: '#0062FF',
@@ -935,21 +897,15 @@ export default function LandingPage({
       {/* =========================================================================
           9. FOOTER
       ========================================================================= */}
-      <footer style={{
+      <footer className="footer-wrapper" style={{
         background: '#040B22',
         borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-        padding: '36px 24px 44px',
         color: 'rgba(255, 255, 255, 0.6)',
         fontSize: '12px'
       }}>
-        <div style={{
+        <div className="footer-inner" style={{
           maxWidth: '1240px',
-          margin: '0 auto',
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: '24px'
+          margin: '0 auto'
         }}>
           {/* Brand */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -967,7 +923,7 @@ export default function LandingPage({
           </div>
 
           {/* Nav links */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '22px' }}>
+          <div className="footer-links-row">
             <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={footerLinkStyle}>Home</button>
             <button onClick={() => scrollToSection('features')} style={footerLinkStyle}>Features</button>
             <button onClick={() => scrollToSection('how-it-works')} style={footerLinkStyle}>How It Works</button>
@@ -977,10 +933,12 @@ export default function LandingPage({
           </div>
 
           {/* Copyright & Legal */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div className="footer-legal-row">
             <span>© 2026 Sovra. All rights reserved.</span>
-            <span style={{ cursor: 'pointer', textDecoration: 'underline' }}>Privacy Policy</span>
-            <span style={{ cursor: 'pointer', textDecoration: 'underline' }}>Terms of Service</span>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <span style={{ cursor: 'pointer', textDecoration: 'underline' }}>Privacy Policy</span>
+              <span style={{ cursor: 'pointer', textDecoration: 'underline' }}>Terms of Service</span>
+            </div>
           </div>
         </div>
       </footer>

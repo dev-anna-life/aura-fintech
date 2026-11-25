@@ -173,7 +173,7 @@ input[type=number]::-webkit-outer-spin-button {
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-8px);
+    transform: translateY(-6px);
   }
 }
 
@@ -182,7 +182,7 @@ input[type=number]::-webkit-outer-spin-button {
     transform: rotate(-2deg) translateY(0px);
   }
   50% {
-    transform: rotate(-1.5deg) translateY(-10px);
+    transform: rotate(-1.5deg) translateY(-8px);
   }
 }
 
@@ -193,7 +193,7 @@ input[type=number]::-webkit-outer-spin-button {
   }
   50% {
     opacity: 0.65;
-    transform: scale(1.08);
+    transform: scale(1.06);
   }
 }
 
@@ -277,6 +277,7 @@ input[type=number]::-webkit-outer-spin-button {
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
               background-color 0.2s ease;
+  touch-action: manipulation;
 }
 
 .sovra-btn-primary:hover {
@@ -293,6 +294,7 @@ input[type=number]::-webkit-outer-spin-button {
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
               border-color 0.2s ease,
               background-color 0.2s ease;
+  touch-action: manipulation;
 }
 
 .sovra-btn-secondary:hover {
@@ -325,12 +327,300 @@ input[type=number]::-webkit-outer-spin-button {
 
 .sovra-reveal {
   opacity: 0;
-  transform: translateY(22px);
-  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(20px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
 .sovra-reveal.is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* =========================================================================
+   RESPONSIVE LANDING PAGE SYSTEM (Mobile-First & Clean Breakpoints)
+   ========================================================================= */
+
+/* Hero Section */
+.hero-section {
+  padding: 44px 16px 70px;
+}
+.hero-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  align-items: center;
+  text-align: center;
+}
+.hero-text-col {
+  max-width: 100%;
+}
+.hero-btn-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 12px;
+}
+.hero-btn-group button {
+  width: 100%;
+  justify-content: center;
+}
+.laptop-sidebar {
+  display: none !important;
+}
+.laptop-mockup-wrapper {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Why Sovra Section */
+.why-sovra-section {
+  padding: 56px 16px;
+}
+.why-sovra-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.why-sovra-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* How It Works Section */
+.how-it-works-section {
+  padding: 56px 16px 70px;
+}
+.how-it-works-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Companion Card Section */
+.companion-section {
+  padding: 56px 16px;
+}
+.companion-card {
+  padding: 28px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  text-align: center;
+  align-items: center;
+  border-radius: 20px;
+}
+.companion-btn {
+  width: 100% !important;
+  justify-content: center;
+}
+
+/* Security Banner Section */
+.security-section {
+  padding: 0 16px 56px;
+}
+.security-banner {
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-radius: 16px;
+  text-align: left;
+}
+.security-banner-right {
+  border-left: none !important;
+  padding-left: 0 !important;
+  border-top: 1px solid #D0E2FD;
+  padding-top: 12px;
+  font-size: 13px !important;
+}
+
+/* FAQ Section */
+.faq-section {
+  padding: 56px 16px;
+}
+.faq-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Ready to Take Control CTA Banner */
+.cta-section {
+  padding: 0 16px 64px;
+}
+.cta-banner {
+  padding: 28px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  text-align: center;
+  align-items: center;
+  border-radius: 20px;
+}
+.cta-btn {
+  width: 100% !important;
+  justify-content: center;
+}
+
+/* Footer Section */
+.footer-wrapper {
+  padding: 32px 16px 40px;
+}
+.footer-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  text-align: center;
+  align-items: center;
+}
+.footer-links-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+.footer-legal-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Tablet & Desktop Upgrades */
+@media (min-width: 640px) {
+  .hero-btn-group {
+    flex-direction: row;
+    width: auto;
+    justify-content: center;
+  }
+  .hero-btn-group button {
+    width: auto;
+  }
+  .laptop-sidebar {
+    display: flex !important;
+  }
+  .why-sovra-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .footer-legal-row {
+    flex-direction: row;
+    gap: 16px;
+  }
+}
+
+@media (min-width: 900px) {
+  .hero-section {
+    padding: 64px 24px 90px;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 48px;
+    text-align: left;
+    align-items: center;
+  }
+  .hero-text-col {
+    max-width: 560px;
+  }
+  .hero-btn-group {
+    justify-content: flex-start;
+  }
+  .why-sovra-section {
+    padding: 80px 24px;
+  }
+  .why-sovra-header {
+    text-align: left;
+    margin-bottom: 48px;
+  }
+  .why-sovra-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .how-it-works-section {
+    padding: 70px 24px 90px;
+  }
+  .how-it-works-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+  .companion-section {
+    padding: 80px 24px;
+  }
+  .companion-card {
+    padding: 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    text-align: left;
+    align-items: center;
+    border-radius: 28px;
+  }
+  .companion-btn {
+    width: auto !important;
+  }
+  .security-section {
+    padding: 0 24px 70px;
+  }
+  .security-banner {
+    padding: 24px 32px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 20px;
+  }
+  .security-banner-right {
+    border-left: 2px solid #D0E2FD !important;
+    padding-left: 24px !important;
+    border-top: none !important;
+    padding-top: 0 !important;
+    font-size: 15px !important;
+  }
+  .faq-section {
+    padding: 70px 24px;
+  }
+  .faq-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 48px;
+  }
+  .cta-section {
+    padding: 0 24px 80px;
+  }
+  .cta-banner {
+    padding: 44px;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+    border-radius: 24px;
+  }
+  .cta-btn {
+    width: auto !important;
+  }
+  .footer-wrapper {
+    padding: 36px 24px 44px;
+  }
+  .footer-inner {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+  .footer-links-row {
+    gap: 22px;
+  }
+}
+
+/* Mobile-Specific Performance: Prevent scroll stutter & reveal blankness */
+@media (max-width: 768px) {
+  .sovra-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .sovra-float-laptop {
+    animation-duration: 7s;
+  }
 }
