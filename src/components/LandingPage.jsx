@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import Lenis from 'lenis'
+import 'lenis/dist/lenis.css'
 
 export default function LandingPage({
   onGetStarted,
@@ -12,31 +14,55 @@ export default function LandingPage({
 }) {
   const [openFaq, setOpenFaq] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const lenisRef = useRef(null)
 
   useEffect(() => {
+    // Initialize Lenis momentum inertia scroll on desktop
+    const lenis = new Lenis({
+      duration: 1.3,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 1.15,
+      touchMultiplier: 1.0,
+      infinite: false
+    })
+
+    lenisRef.current = lenis
+
+    function raf(time) {
+      lenis.raf(time)
+      requestAnimationFrame(raf)
+    }
+
+    const rafId = requestAnimationFrame(raf)
+
     // On mobile screens, immediately reveal everything for zero-latency scrolling
     if (typeof window !== 'undefined' && window.innerWidth <= 768) {
       document.querySelectorAll('.sovra-reveal').forEach((el) => {
         el.classList.add('is-visible')
       })
-      return
+    } else {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible')
+            }
+          })
+        },
+        { threshold: 0.05, rootMargin: '120px 0px 60px 0px' }
+      )
+
+      const elements = document.querySelectorAll('.sovra-reveal')
+      elements.forEach((el) => observer.observe(el))
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible')
-          }
-        })
-      },
-      { threshold: 0.05, rootMargin: '120px 0px 60px 0px' }
-    )
-
-    const elements = document.querySelectorAll('.sovra-reveal')
-    elements.forEach((el) => observer.observe(el))
-
-    return () => observer.disconnect()
+    return () => {
+      cancelAnimationFrame(rafId)
+      lenis.destroy()
+    }
   }, [])
 
   const faqs = [
@@ -64,9 +90,22 @@ export default function LandingPage({
 
   function scrollToSection(id) {
     setMobileMenuOpen(false)
-    const el = document.getElementById(id)
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' })
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo('#' + id, { offset: -70, duration: 1.4 })
+    } else {
+      const el = document.getElementById(id)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' })
+      }
+    }
+  }
+
+  function scrollToTop() {
+    setMobileMenuOpen(false)
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { duration: 1.4 })
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
@@ -100,7 +139,7 @@ export default function LandingPage({
         }}>
           {/* Logo */}
           <div
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onClick={scrollToTop}
             style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
           >
             <img
@@ -120,7 +159,7 @@ export default function LandingPage({
 
           {/* Desktop Nav Links */}
           <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={navLinkStyleActive}>Home</button>
+            <button onClick={scrollToTop} style={navLinkStyleActive}>Home</button>
             <button onClick={() => scrollToSection('features')} style={navLinkStyle}>Features</button>
             <button onClick={() => scrollToSection('how-it-works')} style={navLinkStyle}>How It Works</button>
             <button onClick={onOpenAbout ? onOpenAbout : () => scrollToSection('why-sovra')} style={navLinkStyle}>About</button>
@@ -224,7 +263,7 @@ export default function LandingPage({
             flexDirection: 'column',
             gap: '16px'
           }}>
-            <button onClick={() => { setMobileMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={mobileNavLinkStyle}>Home</button>
+            <button onClick={scrollToTop} style={mobileNavLinkStyle}>Home</button>
             <button onClick={() => scrollToSection('features')} style={mobileNavLinkStyle}>Features</button>
             <button onClick={() => scrollToSection('how-it-works')} style={mobileNavLinkStyle}>How It Works</button>
             <button onClick={onOpenAbout ? onOpenAbout : () => scrollToSection('why-sovra')} style={mobileNavLinkStyle}>About</button>
@@ -908,7 +947,7 @@ export default function LandingPage({
           margin: '0 auto'
         }}>
           {/* Brand */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div onClick={scrollToTop} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
             <img
               src="/sovra-logo.png"
               alt="Sovra"
@@ -924,7 +963,7 @@ export default function LandingPage({
 
           {/* Nav links */}
           <div className="footer-links-row">
-            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={footerLinkStyle}>Home</button>
+            <button onClick={scrollToTop} style={footerLinkStyle}>Home</button>
             <button onClick={() => scrollToSection('features')} style={footerLinkStyle}>Features</button>
             <button onClick={() => scrollToSection('how-it-works')} style={footerLinkStyle}>How It Works</button>
             <button onClick={onOpenAbout ? onOpenAbout : () => scrollToSection('why-sovra')} style={footerLinkStyle}>About</button>
